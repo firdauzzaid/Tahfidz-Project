@@ -1,0 +1,22 @@
+{
+  "menu": [
+    {
+      "url": "dashboard-guru",
+      "name": "Dashboard Guru",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "guru.dashboard-guru"
+    },
+    {
+      "url": "kelola-absen",
+      "name": "Kelola Absen",
+      "icon": "menu-icon tf-icons ti ti-calendar",
+      "slug": "guru.kelola-absen"
+    },
+    {
+      "url": "master-nilai",
+      "name": "Master Nilai",
+      "icon": "menu-icon tf-icons ti ti-file-analytics",
+      "slug": "guru.master-nilai"
+    }
+  ]
+}

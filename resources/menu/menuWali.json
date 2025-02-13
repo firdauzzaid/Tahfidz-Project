@@ -1,0 +1,22 @@
+{
+  "menu": [
+    {
+      "url": "dashboard-wali",
+      "name": "Dashboard Wali",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "wali.dashboard-wali"
+    },
+    {
+      "url": "data-absensi",
+      "name": "Data Absensi",
+      "icon": "menu-icon tf-icons ti ti-file",
+      "slug": "wali.data-absensi"
+    },
+    {
+      "url": "data-nilai",
+      "name": "Data Nilai",
+      "icon": "menu-icon tf-icons ti ti-book",
+      "slug": "wali.data-nilai"
+    }
+  ]
+}

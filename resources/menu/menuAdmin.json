@@ -1,0 +1,56 @@
+{
+  "menu": [
+    {
+      "url": "dashboard-admin",
+      "name": "Dashboard Admin",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "admin.dashboard-admin"
+    },
+    {
+      "url": "kelola-guru",
+      "name": "Kelola Guru",
+      "icon": "menu-icon tf-icons ti ti-user-star",
+      "slug": "admin.kelola-guru"
+    },
+    {
+      "url": "kelola-santri",
+      "name": "Kelola Santri",
+      "icon": "menu-icon tf-icons ti ti-users-group",
+      "slug": "admin.kelola-santri"
+    },
+    {
+      "name": "Kelola Grup",
+      "icon": "menu-icon tf-icons ti ti-category",
+      "slug": "admin.kelola-grup-cabang",
+      "submenu": [
+        {
+          "url": "kelola-grup-cabang",
+          "name": "Kelas",
+          "slug": "admin.kelola-grup-cabang"
+        },
+        {
+          "url": "kelola-grup-santri",
+          "name": "Rombel",
+          "slug": "admin.kelola-grup-santri"
+        },
+        {
+          "url": "kelola-grup-kelompok",
+          "name": "Kelompok Qur'an",
+          "slug": "admin.kelola-grup-kelompok"
+        }
+      ]
+    },
+    {
+      "url": "kelola-juz",
+      "name": "Kelola Juz",
+      "icon": "menu-icon tf-icons ti ti-book",
+      "slug": "admin.kelola-juz"
+    },
+    {
+      "url": "pengaturan-website",
+      "name": "Pengaturan Website",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "admin.pengaturan-website"
+    }
+  ]
+}
