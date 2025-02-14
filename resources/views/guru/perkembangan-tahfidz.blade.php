@@ -147,7 +147,7 @@
                         <div class="mb-3">
                             <label for="surahUpdate" class="form-label">Surah</label>
                             <select class="form-select" id="surahUpdate" name="id_surah" required>
-                                <option selected value="">Pilih Surah</option>
+                                <option selected>Pilih Surah</option>
                                 <!-- Options Here -->
                             </select>
                         </div>
@@ -205,6 +205,11 @@
                                         <td>{{ $item->created_at }}</td>
                                         <td class="text-center">
                                             <div class="d-flex flex-row justify-content-center align-items-center">
+                                                <!-- Button Edit -->
+                                                <button type="button" class="btn btn-warning me-2" data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditData{{ $item->id }}">
+                                                    <i class="ti ti-edit me-2"></i>Edit
+                                                </button>
                                                 <!-- Button Delete -->
                                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                                     data-bs-target="#modalHapusData{{ $item->id }}">
@@ -213,6 +218,55 @@
                                             </div>
                                         </td>
                                     </tr>
+
+                                    <!-- Modal Edit Data -->
+                                    <div class="modal fade" id="modalEditData{{ $item->id }}" tabindex="-1"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Edit Data</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <form action="/edit-perkembangan-tahfidz/{{ $item->id }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    <div class="modal-body">
+                                                        <!-- Form untuk edit -->
+                                                        <div class="mb-3">
+                                                            <label for="santriUpdate" class="form-label">Data Santri</label>
+                                                            <select class="form-select" id="santriUpdate" name="id_santri" required>
+                                                                <option selected>{{ $item->nama_santri }}</option>
+                                                                <!-- Options Here -->
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="surahUpdate" class="form-label">Surah</label>
+                                                            <select class="form-select" id="surahUpdate" name="id_surah" required>
+                                                                <option selected>{{ $item->nama_surat }}</option>
+                                                                <!-- Options Here -->
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="ayat" class="form-label">Ayat</label>
+                                                            <input type="text" name="ayat" class="form-control"
+                                                                value="{{ $item->ayat }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="keterangan" class="form-label">Keterangan</label>
+                                                            <textarea name="keterangan" class="form-control" required>{{ $item->keterangan }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-primary">Update</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <!-- Modal Hapus Data -->
                                     <div class="modal fade" id="modalHapusData{{ $item->id }}" tabindex="-1"

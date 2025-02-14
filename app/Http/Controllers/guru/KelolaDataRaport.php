@@ -81,6 +81,19 @@ class KelolaDataRaport extends Controller
         ->get()
         ->toArray();
 
+    /// Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $request->grup_cabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $request->grup_santri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $request->grup_kelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
     // Simpan data baru
     $nilaiId = DB::table('nilai_ptahsin')->insertGetId([
       'id_guru' => $guruId,
@@ -101,6 +114,18 @@ class KelolaDataRaport extends Controller
       'idGrupSantri' => $request->grup_santri,
       'idGrupKelompok' => $request->grup_kelompok,
       'santriData' => $santriData,
+    ]);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
     ]);
 
     // Update selected_surah di session
@@ -252,24 +277,21 @@ class KelolaDataRaport extends Controller
       'keterangan' => 'nullable|string',
     ]);
     
-    // Cek apakah sudah ada nilai santri untuk santri yang sama
-    $exists = DB::table('nilai_ptahfidz')
-      ->where('id_santri', $request->id_santri)
-      ->where('tanggal', $request->tanggal)
-      ->exists();
-    
-      if ($exists) {
-        return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai Pada Tanggal yang Sama.');
-    }
+    // Cek apakah santri sudah memiliki nilai pada tanggal atau surah yang sama
+    $existingRecord = DB::table('nilai_ptahfidz')
+        ->where('id_santri', $request->id_santri)
+        ->where(function ($query) use ($request) {
+            $query->where('tanggal', $request->tanggal)
+                  ->orWhere('id_surah', $request->id_surah);
+        })
+        ->first();
 
-    // Cek apakah sudah ada nilai santri untuk surah yang sama
-    $exists = DB::table('nilai_ptahfidz')
-      ->where('id_santri', $request->id_santri)
-      ->where('id_surah', $request->id_surah)
-      ->exists();
+      if ($existingRecord) {
+        $errorMessage = $existingRecord->tanggal == $request->tanggal 
+            ? 'Santri sudah memiliki nilai pada tanggal yang sama.'
+            : 'Santri sudah memiliki nilai pada surah yang sama.';
 
-      if ($exists) {
-        return redirect()->back()->with('error', 'Santri Sudah Memiliki Nilai Pada Surah yang Sama');
+        return redirect()->back()->with('error', $errorMessage);
     }
 
     // Ambil data santri untuk dropdown berdasarkan kelompok yang dipilih
@@ -285,8 +307,29 @@ class KelolaDataRaport extends Controller
       ->where('id_juz_level', $request->level)
       ->get()
       ->toArray();
+
+    /// Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $request->grup_cabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $request->grup_santri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $request->grup_kelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
+    $grupJuz = DB::table('juz')
+        ->where('id', $request->id_juz)
+        ->first(['id', 'nama_juz']);
+
+    $grupLevel = DB::table('juz_level')
+        ->where('id', $request->level)
+        ->first(['id', 'id_juz', 'level']);
     
-        // Simpan data baru
+    // Simpan data baru
     $nilaiId = DB::table('nilai_ptahfidz')->insertGetId([
       'id_guru' => $guruId,
       'id_santri' => $request->id_santri,
@@ -308,11 +351,24 @@ class KelolaDataRaport extends Controller
       'idGrupSantri' => $request->grup_santri,
       'idGrupKelompok' => $request->grup_kelompok,
       'tanggal' => $request->tanggal,
-      'id_juz' => $request->id_juz,
-      'levelID' => $request->level,
-      'id_surah' => $request->id_surah,
+      'juz' => $request->id_juz,
+      'id_juz' => $request->level,
       'santriData' => $santriData,
       'surahData' => $surahData,
+    ]);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok || !$grupJuz || !$grupLevel) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+      'namaJuz' => $grupJuz,
+      'namaLevel' => $grupLevel,
     ]);
 
     // Update selected_santri di session
@@ -345,27 +401,24 @@ class KelolaDataRaport extends Controller
     $grupSantri = session('idGrupSantri');
     $grupKelompok = session('idGrupKelompok');
     $tanggal = session('tanggal');
-    $idJuz = session('id_juz');
-    $idLevel = session('levelID');
+    $idJuz = session('juz');
+    $idLevel = session('id_juz');
     
-    // Cek apakah sudah ada nilai santri untuk tanggal yang sama
-    $exists = DB::table('nilai_ptahfidz')
-      ->where('id_santri', $request->id_santri)
-      ->where('tanggal', $request->tanggal)
-      ->exists();
-    
-      if ($exists) {
-        return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai Pada Tanggal yang Sama.');
-    }
+    // Cek apakah santri sudah memiliki nilai pada tanggal atau surah yang sama
+    $existingRecord = DB::table('nilai_ptahfidz')
+        ->where('id_santri', $idSantri)
+        ->where(function ($query) use ($request) {
+            $query->where('tanggal', $request->tanggal)
+                  ->orWhere('id_surah', $request->id_surah);
+        })
+        ->first();
 
-    // Cek apakah sudah ada nilai santri untuk surah yang sama
-    $exists = DB::table('nilai_ptahfidz')
-      ->where('id_santri', $idSantri)
-      ->where('id_surah', $request->id_surah)
-      ->exists();
+      if ($existingRecord) {
+        $errorMessage = $existingRecord->tanggal == $request->tanggal 
+            ? 'Santri sudah memiliki nilai pada tanggal yang sama.'
+            : 'Santri sudah memiliki nilai pada surah yang sama.';
 
-      if ($exists) {
-        return redirect()->back()->with('error', 'Santri Sudah Memiliki Nilai Pada Surah yang Sama');
+        return redirect()->back()->with('error', $errorMessage);
     }
 
     /// Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
@@ -440,17 +493,11 @@ class KelolaDataRaport extends Controller
   public function editPTahfidz(Request $request, $id)
   {
     $request->validate([
-      'tanggal' => 'required|date',
-      'id_juz' => 'required',
-      'id_surah' => 'required',
       'ayat' => 'required|string',
       'keterangan' => 'nullable|string',
     ]);
 
     DB::table('nilai_ptahfidz')->where('id', $id)->update([
-      'tanggal' => $request->tanggal,
-      'id_juz' => $request->id_juz,
-      'id_surah' => $request->id_surah,
       'ayat' => $request->ayat,
       'keterangan' => $request->keterangan,
       'updated_at' => now(),
@@ -922,6 +969,7 @@ class KelolaDataRaport extends Controller
           ->where('id', $idJuz)
           ->first(['id', 'id_juz', 'level']);
 
+    // Cek data dalam session
     if ($namaGrup->isNotEmpty() && $namaSantri->isNotEmpty() && $namaJuz->isNotEmpty() && $namaLevel->isNotEmpty()) {
       session([
         'namaGrup' => $namaGrup,
@@ -1068,42 +1116,6 @@ class KelolaDataRaport extends Controller
     return response()->json($dataSurah);
   }
 
-  public function updateSurahData()
-  {
-      // Ambil id_juz dari session
-      $idJuz = session('id_juz');
-      $selectedSurah = session('selected_surah', []);
-
-      if (!$idJuz) {
-          return response()->json([
-              'success' => false,
-              'message' => 'ID Juz tidak ditemukan dalam session.',
-          ], 400);
-      }
-
-      // Menampilkan data surah yang sesuai dengan id_juz 
-      $surahData = DB::table('juz_surat')
-          ->where('id_juz_level', $idJuz)
-          ->get(['id', 'id_juz_level', 'nama_surat']);
-
-        if ($surahData->isEmpty()) {
-          return response()->json([
-                'success' => false,
-                'message' => 'Tidak ada data surah yang tersedia untuk ID Juz ini.',
-          ], 404);
-      }
-
-      // Filter surah yang belum dipilih
-      $filteredSurahData = $surahData->reject(function ($surah) use ($selectedSurah) {
-          return in_array($surah->id, $selectedSurah);
-      })->values();
-
-      return response()->json([
-          'success' => true,
-          'surah_data' => $filteredSurahData,
-      ]);
-  }
-
   public function updateSantriData()
   {
       // Ambil id_juz dari session
@@ -1139,6 +1151,43 @@ class KelolaDataRaport extends Controller
           'success' => true,
           'santri_data' => $filteredSantriData,
           'selected_santri' => $selectedSantri,
+      ]);
+  }
+
+  public function updateSurahData()
+  {
+      // Ambil id_juz dari session
+      $idJuz = session('id_juz');
+      $selectedSurah = session('selected_surah', []);
+
+      if (!$idJuz) {
+          return response()->json([
+              'success' => false,
+              'message' => 'ID Juz tidak ditemukan dalam session.',
+          ], 400);
+      }
+
+      // Menampilkan data surah yang sesuai dengan id_juz 
+      $surahData = DB::table('juz_surat')
+          ->where('id_juz_level', $idJuz)
+          ->get(['id', 'nama_surat']);
+
+        if ($surahData->isEmpty()) {
+          return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada data surah yang tersedia untuk ID Juz ini.',
+          ], 404);
+      }
+
+      // Filter surah yang belum dipilih
+      $filteredSurahData = $surahData->reject(function ($surah) use ($selectedSurah) {
+          return in_array($surah->id, $selectedSurah);
+      })->values();
+
+      return response()->json([
+          'success' => true,
+          'surah_data' => $filteredSurahData,
+          'selected_surah' => $selectedSurah,
       ]);
   }
 }

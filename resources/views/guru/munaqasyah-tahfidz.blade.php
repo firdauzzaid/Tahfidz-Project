@@ -127,7 +127,7 @@
 
                             <div class="mb-3">
                                 <label for="surahUpdate" class="form-label">Surah</label>
-                                <select class="form-select" id="surahUpdate" name="id_juz_level">
+                                <select class="form-select" id="surahUpdate" name="id_juz_level" required>
                                     <option disabled selected>Pilih Surah</option>
                                 </select>
                             </div>
