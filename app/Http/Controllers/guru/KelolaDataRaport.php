@@ -279,7 +279,7 @@ class KelolaDataRaport extends Controller
       ->get()
       ->toArray();
 
-    // Ambil data surah untuk dropdown berdasarkan level yang dipilih
+      // Ambil data surah untuk dropdown berdasarkan level yang dipilih
     $surahData = DB::table('juz_surat')
       ->select('id', 'nama_surat')
       ->where('id_juz_level', $request->level)
@@ -308,7 +308,7 @@ class KelolaDataRaport extends Controller
       'idGrupSantri' => $request->grup_santri,
       'idGrupKelompok' => $request->grup_kelompok,
       'tanggal' => $request->tanggal,
-      'juzID' => $request->id_juz,
+      'id_juz' => $request->id_juz,
       'levelID' => $request->level,
       'id_surah' => $request->id_surah,
       'santriData' => $santriData,
@@ -345,7 +345,7 @@ class KelolaDataRaport extends Controller
     $grupSantri = session('idGrupSantri');
     $grupKelompok = session('idGrupKelompok');
     $tanggal = session('tanggal');
-    $idJuz = session('juzID');
+    $idJuz = session('id_juz');
     $idLevel = session('levelID');
     
     // Cek apakah sudah ada nilai santri untuk tanggal yang sama
