@@ -450,7 +450,7 @@
                 }
             });
 
-            // Ambil data Dropdown Surah Update berdasarkan id_juz_level yang dipilih
+            // Ambil data Dropdown Santri Update berdasarkan id_rombel yang dipilih
             const updateSantriDropdown = () => {
                     fetch('/update-santri-data', {
                         method: 'GET',
@@ -527,14 +527,11 @@
                                     );
                                 }
                             });
-
-                            // alert('Dropdown surah berhasil diperbarui!');
                         } else {
                             // alert(data.message || 'Tidak ada data surah yang tersedia.');
                         }
                     })
                     .catch((error) => {
-                        // console.error('Error updating surah data:', error);
                         // alert('Terjadi kesalahan saat memperbarui data surah.');
                     });
             };
