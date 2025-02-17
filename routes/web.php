@@ -107,7 +107,7 @@ Route::middleware(['auth-guru'])->group(function () {
 
   //--Kelola Absen
   Route::get('/kelola-absen', [KelolaAbsen::class, 'index'])->name('guru.kelola-absen');
-  Route::post('/simpan-absensi', [KelolaAbsen::class, 'simpanAbsensi'])->name('guru.kelola-absen');
+  Route::post('/simpan-absensi', [KelolaAbsen::class, 'simpanAbsensi'])->name('guru.simpanAbsensi');
   Route::post('/edit-absensi/{id}', [KelolaAbsen::class, 'editAbsensi'])->name('guru.edit-absensi');
   Route::post('/hapus-absensi/{id}', [KelolaAbsen::class, 'deleteAbsensi'])->name('guru.delete-absensi');
 
@@ -131,20 +131,28 @@ Route::middleware(['auth-guru'])->group(function () {
 
   Route::get('/munaqasyah-tahsin', [KelolaDataRaport::class, 'munaqasyahTahsin'])->name('guru.munaqasyahTahsin');
   Route::post('/simpan-munaqasyah-tahsin', [KelolaDataRaport::class, 'simpanMTahsin'])->name('guru.simpanMTahsin');
+  Route::post('/simpan-data-lanjutan-mtahsin', [KelolaDataRaport::class, 'simpanDataLanjutanMTahsin'])->name('guru.simpanDataLanjutanMTahsin');
+  Route::get('/tambah-data-awal-mtahfidz', [KelolaDataRaport::class, 'tambahDataAwalMTahsin'])->name('guru.tambahDataAwalMTahsin');
   Route::post('/hapus-munaqasyah-tahsin/{id}', [KelolaDataRaport::class, 'hapusMTahsin'])->name('guru.hapusMTahsin');
 
   Route::get('/munaqasyah-tahfidz', [KelolaDataRaport::class, 'munaqasyahTahfidz'])->name('guru.munaqasyahTahfidz');
   Route::post('/simpan-munaqasyah-tahfidz', [KelolaDataRaport::class, 'simpanMTahfidz'])->name('guru.simpanMTahfidz');
   Route::post('/simpan-data-lanjutan-mtahfidz', [KelolaDataRaport::class, 'simpanDataLanjutanMTahfidz'])->name('guru.simpanDataLanjutanMTahfidz');
-  Route::get('/tambah-data-awal', [KelolaDataRaport::class, 'tambahDataAwal'])->name('guru.tambahDataAwal');
+  Route::get('/tambah-data-awal-mtahfidz', [KelolaDataRaport::class, 'tambahDataAwalMTahfidz'])->name('guru.tambahDataAwalMTahfidz');
   Route::post('/hapus-munaqasyah-tahfidz/{id}', [KelolaDataRaport::class, 'hapusMTahfidz'])->name('guru.hapusMTahfidz');
 
   Route::get('/murojaah', [KelolaDataRaport::class, 'murojaah'])->name('guru.murojaah');
   Route::post('/simpan-murojaah', [KelolaDataRaport::class, 'simpanMurojaah'])->name('guru.simpanMurojaah');
+  Route::post('/simpan-data-lanjutan-murojaah', [KelolaDataRaport::class, 'simpanDataLanjutanMurojaah'])->name('guru.simpanDataLanjutanMurojaah');
+  Route::get('/tambah-data-awal-murojaah', [KelolaDataRaport::class, 'tambahDataAwalMurojaah'])->name('guru.tambahDataAwalMurojaah');
+  Route::post('/edit-murojaah/{id}', [KelolaDataRaport::class, 'editMurojaah'])->name('guru.editMurojaah');
   Route::post('/hapus-murojaah/{id}', [KelolaDataRaport::class, 'hapusMurojaah'])->name('guru.hapusMurojaah');
 
   Route::get('/tasmi', [KelolaDataRaport::class, 'tasmi'])->name('guru.tasmi');
   Route::post('/simpan-tasmi', [KelolaDataRaport::class, 'simpanTasmi'])->name('guru.simpanTasmi');
+  Route::post('/simpan-data-lanjutan-tasmi', [KelolaDataRaport::class, 'simpanDataLanjutanTasmi'])->name('guru.simpanDataLanjutanTasmi');
+  Route::get('/tambah-data-awal-tasmi', [KelolaDataRaport::class, 'tambahDataAwalTasmi'])->name('guru.tambahDataAwalTasmi');
+  Route::post('/edit-tasmi/{id}', [KelolaDataRaport::class, 'editTasmi'])->name('guru.editTasmi');
   Route::post('/hapus-tasmi/{id}', [KelolaDataRaport::class, 'hapusTasmi'])->name('guru.hapusTasmi');
 
   Route::get('/kelola-data-raport', [KelolaDataRaport::class, 'index'])->name('guru.kelola-data-raport');

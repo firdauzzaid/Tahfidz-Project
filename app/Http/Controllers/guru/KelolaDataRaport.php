@@ -19,34 +19,186 @@ class KelolaDataRaport extends Controller
     return view('guru.kelola-data-raport');
   }
   
+  ##### ---------- Controller Menu Munaqasyah Tahsin ---------- #####
   // Simpan data ke tabel nilai_mtahsin
   public function simpanMTahsin(Request $request)
   {
-        $guruId = Auth::user()->id;
+    $guruId = Auth::user()->id;
     
-        // Validasi input
-        $request->validate([
-            'id_santri' => 'required',
-            'jilid' => 'required',
-            'level' => 'required',
-            'nilai' => 'required|integer',
-        ]);
+    // Validasi input
+    $request->validate([
+      'grup_cabang' => 'required',
+      'grup_santri' => 'required',
+      'grup_kelompok' => 'required',
+      'id_santri' => 'required',
+      'jilid' => 'required',
+      'level' => 'required',
+      'nilai' => 'required|integer',
+    ]);
+
+    // Cek apakah data dengan id_santri sudah ada di tabel
+    $exists = DB::table('nilai_mtahsin')
+      ->where('id_santri', $request->id_santri)
+      ->exists();
     
+      if ($exists) {
+        return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai.');
+    }
+
+    // Ambil data santri untuk dropdown berdasarkan kelompok yang dipilih
+    $santriData = DB::table('data_santri')
+        ->select('id', 'nama_lengkap')
+        ->where('id_grup_kelompok', $request->grup_kelompok)
+        ->get()
+        ->toArray();
+
+    /// Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $request->grup_cabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $request->grup_santri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $request->grup_kelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
     
-        // Simpan data baru
-        DB::table('nilai_mtahsin')->insert([
-            'id_guru' => $guruId,
-            'id_santri' => $request->id_santri,
-            'jilid' => $request->jilid,
-            'level' => $request->level,
-            'nilai' => $request->nilai,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+    // Simpan data baru
+    $nilaiId = DB::table('nilai_mtahsin')->insertGetId([
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'jilid' => $request->jilid,
+      'level' => $request->level,
+      'nilai' => $request->nilai,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ]);
+
+    // Menyimpan informasi dalam session untuk digunakan nanti
+    session([
+      'nilaiId' => $nilaiId,
+      'id_guru' => $guruId,
+      'idGrupCabang' => $request->grup_cabang,
+      'idGrupSantri' => $request->grup_santri,
+      'idGrupKelompok' => $request->grup_kelompok,
+      'santriData' => $santriData,
+    ]);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+    ]);
+
+    // Update selected_surah di session
+    $selectedSantri = session('selected_santri', []);
+    $selectedSantri[] = $request->id_santri;
+    session(['selected_santri' => $selectedSantri]);
     
-        return redirect()->back()->with('success', 'Nilai Munaqasyah Tahsin Berhasil Disimpan');
+    return redirect()->back()->with('success', 'Nilai Munaqasyah Tahsin Berhasil Disimpan');
   }
 
+  // Simpan data nilai lanjutan ke tabel m_tahsin
+  public function simpanDataLanjutanMTahsin(Request $request)
+  { 
+    // Validasi input
+    $request->validate([
+      'id_santri' => 'required',
+      'jilid' => 'required',
+      'level' => 'required',
+      'nilai' => 'required|integer',
+    ]);
+
+    $guruId = session('id_guru');
+    $grupCabang = session('idGrupCabang');
+    $grupSantri = session('idGrupSantri');
+    $grupKelompok = session('idGrupKelompok');
+    
+    // Cek apakah data dengan id_santri sudah ada di tabel
+    $exists = DB::table('nilai_mtahsin')
+      ->where('id_santri', $request->id_santri)
+      ->exists();
+    
+      if ($exists) {
+        return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai.');
+    }
+
+    /// Ambil data kelas, rombel, dan kelompok berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $grupCabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $grupSantri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $grupKelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+    ]);
+
+    // Simpan data baru
+    DB::table('nilai_mtahsin')->insert([
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'jilid' => $request->jilid,
+      'level' => $request->level,
+      'nilai' => $request->nilai,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ]);
+
+    // Update selected_surah di session
+    $selectedSantri = session('selected_santri', []);
+    $selectedSantri[] = $request->id_santri;
+    session(['selected_santri' => $selectedSantri]);
+
+    return redirect()->back()->with('success', 'Penilaian berhasil disimpan, lanjutkan penilaian!');
+  }
+
+  // Reset data untuk menambahkan data baru m_tahsin
+  public function tambahDataAwalMTahsin()
+  {
+      // Hapus data session jika ada dan arahkan ke halaman input awal
+      session()->forget('nilaiId', 'idGrupCabang', 'idGrupSantri', 'idGrupKelompok');
+      return redirect()->route('guru.munaqasyahTahsin');
+  }
+
+  public function hapusMTahsin($id)
+  {
+    // Cari data berdasarkan ID
+    $data = DB::table('nilai_mtahsin')->where('id', $id)->first();
+
+    if (!$data) {
+      return redirect()->back()->with('error', 'Data tidak ditemukan.');
+    }
+
+    // Hapus data
+    DB::table('nilai_mtahsin')->where('id', $id)->delete();
+
+    return redirect()->back()->with('success', 'Data berhasil dihapus.');
+  }
+
+  ##### ---------- Controller Menu Perkembangan Tahsin ---------- #####
   // Simpan data ke tabel nilai_ptahsin
   public function simpanPTahsin(Request $request)
   {
@@ -64,11 +216,11 @@ class KelolaDataRaport extends Controller
         'keterangan' => 'nullable|string',
     ]);
     
-    // Cek apakah data dengan id_santri sudah ada di tabel
+    // Cek apakah data dengan id_santri sudah ada dengan tanggal yang sama
     $exists = DB::table('nilai_ptahsin')
-                ->where('id_santri', $request->id_santri)
-                ->where('tanggal', $request->tanggal)
-                ->exists();
+      ->where('id_santri', $request->id_santri)
+      ->where('tanggal', $request->tanggal)
+      ->exists();
     
     if ($exists) {
         return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai Pada Tanggal yang Sama.');
@@ -258,6 +410,238 @@ class KelolaDataRaport extends Controller
     return redirect()->back()->with('success', 'Data berhasil dihapus.');
   }
 
+  ##### ---------- Controller Menu Munaqasyah Tahfidz ---------- #####
+  // Simpan data tabel ke nilai m_tahfidz
+  public function simpanMTahfidz(Request $request)
+  {
+    $guruId = Auth::user()->id;
+
+    // Validasi input
+    $request->validate([
+      'grup_cabang' => 'required',
+      'grup_santri' => 'required',
+      'grup_kelompok' => 'required',
+      'id_santri' => 'required',
+      'tanggal' => 'required|date',
+      'juz' => 'required',
+      'id_juz' => 'required',
+      'id_juz_level' => 'required',
+      'pengetahuan' => 'required|integer',
+      'fashohah' => 'required|integer',
+      'tajwid' => 'required|integer',
+    ]);
+
+    // Cek apakah sudah ada nilai santri untuk surah yang sama
+    $exists = DB::table('nilai_mtahfidz')
+      ->where('id_santri', $request->id_santri)
+      ->where('id_juz_level', $request->id_juz_level)
+      ->exists();
+
+      if ($exists) {
+        return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai Pada Surah yang Sama.');
+    }
+
+    // Ambil data surah untuk dropdown berdasarkan level yang dipilih
+    $surahData = DB::table('juz_surat')
+      ->select('id', 'nama_surat')
+      ->where('id_juz_level', $request->id_juz_level)
+      ->get()
+      ->toArray();
+
+    // Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $request->grup_cabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $request->grup_santri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $request->grup_kelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
+    $kelompokSantri = DB::table('data_santri')
+        ->where('id', $request->id_santri)
+        ->first(['id', 'id_grup_cabang', 'id_grup_santri', 'id_grup_kelompok', 'nama_lengkap']);
+
+    $grupJuz = DB::table('juz')
+        ->where('id', $request->juz)
+        ->first(['id', 'nama_juz']);
+
+    $grupLevel = DB::table('juz_level')
+        ->where('id', $request->id_juz)
+        ->first(['id', 'id_juz', 'level']);
+
+    $nilaiId = DB::table('nilai_mtahfidz')->insertGetId([
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'tanggal' => $request->tanggal,
+      'juz' => $request->juz,
+      'id_juz' => $request->id_juz,
+      'id_juz_level' => $request->id_juz_level,
+      'pengetahuan' => $request->pengetahuan,
+      'fashohah' => $request->fashohah,
+      'tajwid' => $request->tajwid,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ]);
+
+    // Menyimpan informasi dalam session untuk digunakan nanti
+    session([
+      'nilaiId' => $nilaiId,
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'idGrupCabang' => $request->grup_cabang,
+      'idGrupSantri' => $request->grup_santri,
+      'idGrupKelompok' => $request->grup_kelompok,
+      'tanggal' => $request->tanggal,
+      'juz' => $request->juz,
+      'id_juz' => $request->id_juz,
+      'id_juz_level' => $request->id_juz_level,
+      'surah_data' => $surahData,
+    ]);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok || !$kelompokSantri || !$grupJuz || !$grupLevel) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+      'namaSantri' => $kelompokSantri,
+      'namaJuz' => $grupJuz,
+      'namaLevel' => $grupLevel,
+    ]);
+
+    // Update selected_surah di session
+    $selectedSurah = session('selected_surah', []);
+    $selectedSurah[] = $request->id_juz_level;
+    session(['selected_surah' => $selectedSurah]);
+
+    return redirect()->back()->with('success', 'Nilai Munaqasyah Tahfidz Berhasil Disimpan!');
+  }
+
+  // Simpan data nilai lanjutan ke tabel m_tahfidz
+  public function simpanDataLanjutanMTahfidz(Request $request)
+  {
+    $request->validate([
+      'id_juz_level' => 'required',
+      'pengetahuan' => 'required|integer',
+      'fashohah' => 'required|integer',
+      'tajwid' => 'required|integer',
+    ]);
+
+    // Ambil data dari sesi untuk data awal
+    $guruId = session('id_guru');
+    $grupCabang = session('idGrupCabang');
+    $grupSantri = session('idGrupSantri');
+    $grupKelompok = session('idGrupKelompok');
+    $idSantri = session('id_santri');
+    $tanggal = session('tanggal');
+    $juz = session('juz');
+    $idJuz = session('id_juz');
+
+    // Cek apakah sudah ada nilai santri untuk surah yang sama
+    $exists = DB::table('nilai_mtahfidz')
+      ->where('id_santri', $idSantri)
+      ->where('id_juz_level', $request->id_juz_level)
+      ->exists();
+
+      if ($exists) {
+        return redirect()->back()->with('error', 'Santri Sudah Memiliki Nilai Pada Surah yang Sama');
+    }
+
+    // Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $grupCabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $grupSantri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $grupKelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
+    $kelompokSantri = DB::table('data_santri')
+        ->where('id', $idSantri)
+        ->first(['id', 'id_grup_cabang', 'id_grup_santri', 'id_grup_kelompok', 'nama_lengkap']);
+
+    $grupJuz = DB::table('juz')
+        ->where('id', $juz)
+        ->first(['id', 'nama_juz']);
+
+    $grupLevel = DB::table('juz_level')
+        ->where('id', $idJuz)
+        ->first(['id', 'id_juz', 'level']);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok || !$kelompokSantri || !$grupJuz || !$grupLevel) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+      'namaSantri' => $kelompokSantri,
+      'namaJuz' => $grupJuz,
+      'namaLevel' => $grupLevel,
+    ]);
+    
+    // Simpan data lanjutan dengan informasi surah
+    DB::table('nilai_mtahfidz')->insert([
+      'id_guru' => $guruId,
+      'id_santri' => $idSantri,
+      'tanggal' => $tanggal,
+      'juz' => $juz,
+      'id_juz' => $idJuz,
+      'id_juz_level' => $request->id_juz_level,
+      'pengetahuan' => $request->pengetahuan,
+      'fashohah' => $request->fashohah,
+      'tajwid' => $request->tajwid,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ]);
+
+    // Update selected_surah di session
+    $selectedSurah = session('selected_surah', []);
+    $selectedSurah[] = $request->id_juz_level;
+    session(['selected_surah' => $selectedSurah]);
+
+    return redirect()->back()->with('success', 'Penilaian berhasil disimpan, lanjutkan penilaian!');
+  }
+
+  // Reset data untuk menambahkan data baru m_tahfidz
+  public function tambahDataAwalMTahfidz()
+  {
+      // Hapus data session jika ada dan arahkan ke halaman input awal
+      session()->forget('nilaiId', 'namaGrup', 'namaSantri', 'namaJuz', 'namaLevel');
+      return redirect()->route('guru.munaqasyahTahfidz');
+  }
+
+  public function hapusMTahfidz($id)
+  {
+    // Cari data berdasarkan ID
+    $data = DB::table('nilai_mtahfidz')->where('id', $id)->first();
+
+    if (!$data) {
+      return redirect()->back()->with('error', 'Data tidak ditemukan.');
+    }
+
+    // Hapus data
+    DB::table('nilai_mtahfidz')->where('id', $id)->delete();
+
+    return redirect()->back()->with('success', 'Data berhasil dihapus.');
+  }
+
+  ##### ---------- Controller Menu Perkembangan Tahfidz ---------- #####
   // Simpan data ke tabel nilai_ptahfidz
   public function simpanPTahfidz(Request $request)
   {
@@ -308,7 +692,7 @@ class KelolaDataRaport extends Controller
       ->get()
       ->toArray();
 
-    /// Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    // Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
     $cabangKelas = DB::table('grup_cabang')
         ->where('id', $request->grup_cabang)
         ->first(['id', 'nama_grup']);
@@ -513,63 +897,248 @@ class KelolaDataRaport extends Controller
     return redirect()->back()->with('success', 'Data berhasil dihapus');
   }
 
+  ##### ---------- Controller Menu Muroja'ah ---------- #####
   // Simpan data ke tabel nilai_murojaah
   public function simpanMurojaah(Request $request)
   {
-        $guruId = Auth::user()->id;
+    $guruId = Auth::user()->id;
     
-        // Validasi input
-        $request->validate([
-            'id_santri' => 'required',
-            'tanggal' => 'required|date',
-            'waktu' => 'required|date_format:H:i',
-            'juz' => 'required',
-            'nama_surah' => 'required|string',
-            'keterangan' => 'nullable|string',
-        ]);
+    // Validasi input
+    $request->validate([
+      'grup_cabang' => 'required',
+      'grup_santri' => 'required',
+      'grup_kelompok' => 'required',
+      'id_santri' => 'required',
+      'tanggal' => 'required|date',
+      'waktu' => 'required|date_format:H:i',
+      'juz' => 'required',
+      'level' => 'required',
+      'nama_surah' => 'required|string',
+      'keterangan' => 'nullable|string',
+    ]);
+
+    // Cek apakah santri sudah memiliki nilai pada tanggal atau waktu yang sama
+    $existingRecord = DB::table('nilai_murojaah')
+      ->where('id_santri', $request->id_santri)
+      ->where(function ($query) use ($request) {
+          $query->where('tanggal', $request->tanggal)
+                ->orWhere('waktu', $request->waktu);
+      })
+      ->first();
+
+      if ($existingRecord) {
+        $errorMessage = $existingRecord->tanggal == $request->tanggal 
+          ? 'Santri sudah memiliki nilai pada tanggal yang sama.'
+          : 'Santri sudah memiliki nilai pada waktu yang sama.';
+
+        return redirect()->back()->with('error', $errorMessage);
+    }
+
+    // Ambil data santri untuk dropdown berdasarkan kelompok yang dipilih
+    $santriData = DB::table('data_santri')
+      ->select('id', 'nama_lengkap')
+      ->where('id_grup_kelompok', $request->grup_kelompok)
+      ->get()
+      ->toArray();
+
+      // Ambil data surah untuk dropdown berdasarkan level yang dipilih
+    $surahData = DB::table('juz_surat')
+      ->select('id', 'nama_surat')
+      ->where('id_juz_level', $request->level)
+      ->get()
+      ->toArray();
+
+    /// Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $request->grup_cabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $request->grup_santri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $request->grup_kelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
+    $grupJuz = DB::table('juz')
+        ->where('id', $request->juz)
+        ->first(['id', 'nama_juz']);
+
+    $grupLevel = DB::table('juz_level')
+        ->where('id', $request->level)
+        ->first(['id', 'id_juz', 'level']);
     
-        // Cek apakah data dengan id_santri, tanggal, dan waktu yang sama sudah ada di tabel
-        $exists = DB::table('nilai_murojaah')
-                    ->where('id_santri', $request->id_santri)
-                    ->where('tanggal', $request->tanggal)
-                    ->where('waktu', $request->waktu)
-                    ->exists();
+    // Simpan data baru
+    $nilaiId = DB::table('nilai_murojaah')->insertGetId([
+        'id_guru' => $guruId,
+        'id_santri' => $request->id_santri,
+        'tanggal' => $request->tanggal,
+        'waktu' => $request->waktu,
+        'juz' => $request->juz,
+        'nama_surah' => $request->nama_surah,
+        'keterangan' => $request->keterangan,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    // Menyimpan informasi dalam session untuk digunakan nanti
+    session([
+      'nilaiId' => $nilaiId,
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'idGrupCabang' => $request->grup_cabang,
+      'idGrupSantri' => $request->grup_santri,
+      'idGrupKelompok' => $request->grup_kelompok,
+      'tanggal' => $request->tanggal,
+      'juz' => $request->juz,
+      'id_juz' => $request->level,
+      'santriData' => $santriData,
+      'surahData' => $surahData,
+    ]);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok || !$grupJuz || !$grupLevel) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+      'namaJuz' => $grupJuz,
+      'namaLevel' => $grupLevel,
+    ]);
+
+    // Update selected_santri di session
+    $selectedSantri = session('selected_santri', []);
+    $selectedSantri[] = $request->id_santri;
+    session(['selected_santri' => $selectedSantri]);
+
+    // Update selected_surah di session
+    $selectedSurah = session('selected_surah', []);
+    $selectedSurah[] = $request->id_surah;
+    session(['selected_surah' => $selectedSurah]);
     
-        if ($exists) {
-            return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai Pada Tanggal dan Waktu yang Sama.');
-        }
+    return redirect()->back()->with('success', 'Nilai Murojaah Berhasil Disimpan');
+  }
+
+  // Simpan data nilai lanjutan ke tabel nilai_murojaah
+  public function simpanDataLanjutanMurojaah(Request $request)
+  { 
+    // Validasi input
+    $request->validate([
+      'id_santri' => 'required',
+      'waktu' => 'required|date_format:H:i',
+      'nama_surah' => 'required|string',
+      'keterangan' => 'nullable|string',
+   ]);
+
+    $guruId = session('id_guru');
+    $idSantri = session('id_santri');
+    $grupCabang = session('idGrupCabang');
+    $grupSantri = session('idGrupSantri');
+    $grupKelompok = session('idGrupKelompok');
+    $tanggal = session('tanggal');
+    $idJuz = session('juz');
+    $idLevel = session('id_juz');
     
-        // Simpan data baru
-        DB::table('nilai_murojaah')->insert([
-            'id_guru' => $guruId,
-            'id_santri' => $request->id_santri,
-            'tanggal' => $request->tanggal,
-            'waktu' => $request->waktu,
-            'juz' => $request->juz,
-            'nama_surah' => $request->nama_surah,
-            'keterangan' => $request->keterangan,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    
-        return redirect()->back()->with('success', 'Nilai Murojaah Berhasil Disimpan');
+    // Cek apakah santri sudah memiliki nilai pada tanggal atau waktu yang sama
+    $existingRecord = DB::table('nilai_murojaah')
+      ->where('id_santri', $idSantri)
+      ->where(function ($query) use ($request) {
+          $query->where('tanggal', $request->tanggal)
+                ->orWhere('waktu', $request->waktu);
+      })
+      ->first();
+
+      if ($existingRecord) {
+        $errorMessage = $existingRecord->tanggal == $request->tanggal 
+          ? 'Santri sudah memiliki nilai pada tanggal yang sama.'
+          : 'Santri sudah memiliki nilai pada waktu yang sama.';
+
+        return redirect()->back()->with('error', $errorMessage);
+    }
+
+    /// Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $grupCabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $grupSantri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $grupKelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
+    $grupJuz = DB::table('juz')
+        ->where('id', $idJuz)
+        ->first(['id', 'nama_juz']);
+
+    $grupLevel = DB::table('juz_level')
+        ->where('id', $idLevel)
+        ->first(['id', 'id_juz', 'level']);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok || !$grupJuz || !$grupLevel) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+      'namaJuz' => $grupJuz,
+      'namaLevel' => $grupLevel,
+    ]);
+
+    // Simpan data baru
+    DB::table('nilai_murojaah')->insert([
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'tanggal' => $tanggal,
+      'waktu' => $request->waktu,
+      'juz' => $idJuz,
+      'nama_surah' => $request->nama_surah,
+      'keterangan' => $request->keterangan,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ]);
+
+    // Update selected_santri di session
+    $selectedSantri = session('selected_santri', []);
+    $selectedSantri[] = $request->id_santri;
+    session(['selected_santri' => $selectedSantri]);
+
+    // Update selected_surah di session
+    $selectedSurah = session('selected_surah', []);
+    $selectedSurah[] = $request->id_surah;
+    session(['selected_surah' => $selectedSurah]);
+
+    return redirect()->back()->with('success', 'Penilaian berhasil disimpan, lanjutkan penilaian!');
+  }
+
+  // Reset data untuk menambahkan data baru nilai_murojaah
+  public function tambahDataAwalMurojaah()
+  {
+      // Hapus data session jika ada dan arahkan ke halaman input awal
+      session()->forget('nilaiId', 'idGrupCabang', 'idGrupSantri', 'idGrupKelompok', 'namaJuz', 'namaLevel');
+      return redirect()->route('guru.murojaah');
   }
 
   public function editMurojaah(Request $request, $id)
   {
     $request->validate([
-      'tanggal' => 'required|date',
       'waktu' => 'required|date_format:H:i',
-      'juz' => 'required',
-      'nama_surah' => 'required|string',
       'keterangan' => 'nullable|string',
     ]);
 
     DB::table('nilai_murojaah')->where('id', $id)->update([
-      'tanggal' => $request->tanggal,
       'waktu' => $request->waktu,
-      'juz' => $request->juz,
-      'nama_surah' => $request->nama_surah,
       'keterangan' => $request->keterangan,
       'updated_at' => now(),
     ]);
@@ -584,62 +1153,202 @@ class KelolaDataRaport extends Controller
     return redirect()->back()->with('success', 'Nilai Murojaah Berhasil Dihapus');
   }
 
+  ##### ---------- Controller Menu Tasmi' ---------- #####
   // Simpan data ke tabel nilai_tasmi
   public function simpanTasmi(Request $request)
   {
-        $guruId = Auth::user()->id;
+    $guruId = Auth::user()->id;
     
-        // Validasi input
-        $request->validate([
-            'id_santri' => 'required',
-            'juz' => 'required',
-            'status' => 'required',
-            'tajwid1' => 'required|integer',
-            'tajwid2' => 'required|integer',
-            'tajwid3' => 'required|integer',
-            'tajwid4' => 'required|integer',
-            'fashohah1' => 'required|integer',
-            'fashohah2' => 'required|integer',
-            'fashohah3' => 'required|integer',
-            'fashohah4' => 'required|integer',
-        ]);
+    // Validasi input
+    $request->validate([
+        'id_santri' => 'required',
+        'juz' => 'required',
+        'status' => 'required',
+        'tajwid1' => 'required|integer',
+        'tajwid2' => 'required|integer',
+        'tajwid3' => 'required|integer',
+        'tajwid4' => 'required|integer',
+        'fashohah1' => 'required|integer',
+        'fashohah2' => 'required|integer',
+        'fashohah3' => 'required|integer',
+        'fashohah4' => 'required|integer',
+    ]);
     
-        // Cek apakah data dengan id_santri dan juz sudah ada
-        $exists = DB::table('nilai_tasmi')
-                    ->where('id_santri', $request->id_santri)
-                    ->where('juz', $request->juz)
-                    ->exists();
+    // Cek apakah data dengan id_santri dan juz sudah ada
+    $exists = DB::table('nilai_tasmi')
+      ->where('id_santri', $request->id_santri)
+      ->where('juz', $request->juz)
+      ->exists();
     
-        if ($exists) {
-            return redirect()->back()->with('error', "Sudah Ada Nilai Pada Juz {$request->juz} dan Santri Tersebut");
-        }
+      if ($exists) {
+        return redirect()->back()->with('error', "Sudah Ada Nilai Pada Juz {$request->juz} dan Santri Tersebut");
+    }
 
+    // Ambil data santri untuk dropdown berdasarkan kelompok yang dipilih
+    $santriData = DB::table('data_santri')
+      ->select('id', 'nama_lengkap')
+      ->where('id_grup_kelompok', $request->grup_kelompok)
+      ->get()
+      ->toArray();
+
+    // Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $request->grup_cabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $request->grup_santri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $request->grup_kelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
     
-        // Simpan data baru
-        DB::table('nilai_tasmi')->insert([
-            'id_guru' => $guruId,
-            'id_santri' => $request->id_santri,
-            'juz' => $request->juz,
-            'tajwid1' => $request->tajwid1,
-            'tajwid2' => $request->tajwid2,
-            'tajwid3' => $request->tajwid3,
-            'tajwid4' => $request->tajwid4,
-            'fashohah1' => $request->fashohah1,
-            'fashohah2' => $request->fashohah2,
-            'fashohah3' => $request->fashohah3,
-            'fashohah4' => $request->fashohah4,
-            'status' => $request->status,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+    // Simpan data baru
+    $nilaiId = DB::table('nilai_tasmi')->insert([
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'juz' => $request->juz,
+      'tajwid1' => $request->tajwid1,
+      'tajwid2' => $request->tajwid2,
+      'tajwid3' => $request->tajwid3,
+      'tajwid4' => $request->tajwid4,
+      'fashohah1' => $request->fashohah1,
+      'fashohah2' => $request->fashohah2,
+      'fashohah3' => $request->fashohah3,
+      'fashohah4' => $request->fashohah4,
+      'status' => $request->status,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ]);
+
+    // Menyimpan informasi dalam session untuk digunakan nanti
+    session([
+      'nilaiId' => $nilaiId,
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'idGrupCabang' => $request->grup_cabang,
+      'idGrupSantri' => $request->grup_santri,
+      'idGrupKelompok' => $request->grup_kelompok,
+      'status' => $request->status,
+      'santriData' => $santriData,
+    ]);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+    ]);
+
+    // Update selected_santri di session
+    $selectedSantri = session('selected_santri', []);
+    $selectedSantri[] = $request->id_santri;
+    session(['selected_santri' => $selectedSantri]);
     
-        return redirect()->back()->with('success', 'Nilai Tasmi Berhasil Disimpan');
+    return redirect()->back()->with('success', 'Nilai Tasmi Berhasil Disimpan');
+  }
+
+  // Simpan data nilai lanjutan ke tabel nilai_tasmi
+  public function simpanDataLanjutanTasmi(Request $request)
+  {
+    $request->validate([
+      'id_santri' => 'required',
+      'juz' => 'required',
+      'status' => 'required',
+      'tajwid1' => 'required|integer',
+      'tajwid2' => 'required|integer',
+      'tajwid3' => 'required|integer',
+      'tajwid4' => 'required|integer',
+      'fashohah1' => 'required|integer',
+      'fashohah2' => 'required|integer',
+      'fashohah3' => 'required|integer',
+      'fashohah4' => 'required|integer',
+    ]);
+
+    // Ambil data dari sesi untuk data awal
+    $guruId = session('id_guru');
+    $grupCabang = session('idGrupCabang');
+    $grupSantri = session('idGrupSantri');
+    $grupKelompok = session('idGrupKelompok');
+
+    // Cek apakah data dengan id_santri dan juz sudah ada
+    $exists = DB::table('nilai_tasmi')
+      ->where('id_santri', $request->id_santri)
+      ->where('juz', $request->juz)
+      ->exists();
+    
+      if ($exists) {
+        return redirect()->back()->with('error', "Sudah Ada Nilai Pada Juz {$request->juz} dan Santri Tersebut");
+    }
+
+    // Ambil data kelas, rombel, kelompok, juz dan level berdasarkan ID
+    $cabangKelas = DB::table('grup_cabang')
+        ->where('id', $grupCabang)
+        ->first(['id', 'nama_grup']);
+
+    $cabangRombel = DB::table('grup_santri')
+        ->where('id', $grupSantri)
+        ->first(['id', 'id_cabang', 'nama_grup']);
+
+    $cabangKelompok = DB::table('kelompok_quran')
+        ->where('id', $grupKelompok)
+        ->first(['id', 'id_rombel', 'nama_kelompok']);
+
+    // Jika salah satu data tidak ditemukan, tampilkan pesan error
+    if (!$cabangKelas || !$cabangRombel || !$cabangKelompok) {
+      return redirect()->back()->with('error', 'Data Tidak Ditemukan. Silakan periksa kembali.');
+    }
+
+    // Simpan nama kelas, rombel, dan kelompok ke session
+    session([
+      'namaGrupCabang' => $cabangKelas,
+      'namaGrupSantri' => $cabangRombel,
+      'namaGrupKelompok' => $cabangKelompok,
+    ]);
+    
+    // Simpan data lanjutan dengan informasi surah
+    DB::table('nilai_tasmi')->insert([
+      'id_guru' => $guruId,
+      'id_santri' => $request->id_santri,
+      'juz' => $request->juz,
+      'tajwid1' => $request->tajwid1,
+      'tajwid2' => $request->tajwid2,
+      'tajwid3' => $request->tajwid3,
+      'tajwid4' => $request->tajwid4,
+      'fashohah1' => $request->fashohah1,
+      'fashohah2' => $request->fashohah2,
+      'fashohah3' => $request->fashohah3,
+      'fashohah4' => $request->fashohah4,
+      'status' => $request->status,
+      'created_at' => now(),
+      'updated_at' => now(),
+    ]);
+
+    // Update selected_santri di session
+    $selectedSantri = session('selected_santri', []);
+    $selectedSantri[] = $request->id_santri;
+    session(['selected_santri' => $selectedSantri]);
+
+    return redirect()->back()->with('success', 'Penilaian berhasil disimpan, lanjutkan penilaian!');
+  }
+
+  // Reset data untuk menambahkan data baru nilai_tasmi
+  public function tambahDataAwalTasmi()
+  {
+      // Hapus data session jika ada dan arahkan ke halaman input awal
+      session()->forget('nilaiId', 'namaGrup', 'namaSantri', 'namaJuz', 'namaLevel');
+      return redirect()->route('guru.tasmi');
   }
 
   public function editTasmi(Request $request, $id)
   {
     $request->validate([
-      'juz' => 'required',
       'tajwid1' => 'required|integer',
       'tajwid2' => 'required|integer',
       'tajwid3' => 'required|integer',
@@ -651,7 +1360,6 @@ class KelolaDataRaport extends Controller
     ]);
 
     DB::table('nilai_tasmi')->where('id', $id)->update([
-      'juz' => $request->juz,
       'tajwid1' => $request->tajwid1,
       'tajwid2' => $request->tajwid2,
       'tajwid3' => $request->tajwid3,
@@ -673,6 +1381,7 @@ class KelolaDataRaport extends Controller
     return redirect()->back()->with('success', 'Nilai Tasmi Berhasil Dihapus');
   }
 
+  ##### ---------- Controller Index Menu Tabel ---------- #####
   public function perkembanganTahsin()
   {
     // Ambil ID pengguna yang sedang login
@@ -801,6 +1510,8 @@ class KelolaDataRaport extends Controller
     $data = DB::table('nilai_murojaah')
       ->join('users', 'nilai_murojaah.id_guru', '=', 'users.id')
       ->join('data_santri', 'nilai_murojaah.id_santri', '=', 'data_santri.id')
+      ->join('juz', 'nilai_murojaah.juz', '=', 'juz.id')
+      ->join('juz_surat', 'nilai_murojaah.nama_surah', '=', 'juz_surat.id')
       ->where('nilai_murojaah.id_guru', $userId)
       ->select(
         'nilai_murojaah.id',
@@ -813,7 +1524,9 @@ class KelolaDataRaport extends Controller
         'nilai_murojaah.keterangan',
         'nilai_murojaah.created_at',
         'users.nama_lengkap as nama_guru',
-        'data_santri.nama_lengkap as nama_santri'
+        'data_santri.nama_lengkap as nama_santri',
+        'juz.nama_juz as nama_juz',
+        'juz_surat.nama_surat as nama_surat'
       )
       ->get();
 
@@ -830,6 +1543,7 @@ class KelolaDataRaport extends Controller
     $data = DB::table('nilai_tasmi')
       ->join('users', 'nilai_tasmi.id_guru', '=', 'users.id')
       ->join('data_santri', 'nilai_tasmi.id_santri', '=', 'data_santri.id')
+      ->join('juz', 'nilai_tasmi.juz', '=', 'juz.id')
       ->where('nilai_tasmi.id_guru', $userId)
       ->select(
         'nilai_tasmi.id',
@@ -846,7 +1560,8 @@ class KelolaDataRaport extends Controller
         'nilai_tasmi.fashohah4',
         'nilai_tasmi.created_at',
         'users.nama_lengkap as nama_guru',
-        'data_santri.nama_lengkap as nama_santri'
+        'data_santri.nama_lengkap as nama_santri',
+        'juz.nama_juz as nama_juz',
       )
       ->get();
 
@@ -854,179 +1569,7 @@ class KelolaDataRaport extends Controller
     return view('guru.tasmi', compact('data'));
   }
 
-  // Simpan data tabel ke nilai m_tahfidz
-  public function simpanMTahfidz(Request $request)
-  {
-    $guruId = Auth::user()->id;
-
-    // Validasi input
-    $request->validate([
-        'grup_santri' => 'required',
-        'id_santri' => 'required',
-        'tanggal' => 'required|date',
-        'juz' => 'required',
-        'id_juz' => 'required',
-        'id_juz_level' => 'required',
-        'pengetahuan' => 'required|integer',
-        'fashohah' => 'required|integer',
-        'tajwid' => 'required|integer',
-    ]);
-
-    // Cek apakah sudah ada nilai santri untuk surah yang sama
-    $exists = DB::table('nilai_mtahfidz')
-                ->where('id_santri', $request->id_santri)
-                ->where('id_juz_level', $request->id_juz_level)
-                ->exists();
-
-    if ($exists) {
-        return redirect()->back()->with('error', 'Santri Tersebut Sudah Memiliki Nilai Pada Surah yang Sama.');
-    }
-      
-    $nilaiId = DB::table('nilai_mtahfidz')->insertGetId([
-              'id_guru' => $guruId,
-              'id_santri' => $request->id_santri,
-              'tanggal' => $request->tanggal,
-              'juz' => $request->juz,
-              'id_juz' => $request->id_juz,
-              'id_juz_level' => $request->id_juz_level,
-              'pengetahuan' => $request->pengetahuan,
-              'fashohah' => $request->fashohah,
-              'tajwid' => $request->tajwid,
-              'created_at' => now(),
-              'updated_at' => now(),
-    ]);
-
-    // Ambil data surah untuk dropdown berdasarkan level yang dipilih
-    $surahData = DB::table('juz_surat')
-        ->select('id', 'nama_surat')
-        ->where('id_juz_level', $request->id_juz_level)
-        ->get()
-        ->toArray();
-
-    // Menyimpan informasi dalam session untuk digunakan nanti
-    session([
-        'nilaiId' => $nilaiId,
-        'id_guru' => $guruId,
-        'grup_santri' => $request->grup_santri,
-        'id_santri' => $request->id_santri,
-        'tanggal' => $request->tanggal,
-        'juz' => $request->juz,
-        'id_juz' => $request->id_juz,
-        'id_juz_level' => $request->id_juz_level,
-        'surah_data' => $surahData,
-    ]);
-
-    // Update selected_surah di session
-    $selectedSurah = session('selected_surah', []);
-    $selectedSurah[] = $request->id_juz_level;
-    session(['selected_surah' => $selectedSurah]);
-
-      return redirect()->back()->with('success', 'Penilaian berhasil disimpan, lanjutkan penilaian!');
-  }
-
-  // Simpan data nilai lanjutan ke tabel m_tahfidz
-  public function simpanDataLanjutanMTahfidz(Request $request)
-  {
-    $request->validate([
-      'id_juz_level' => 'required',
-      'pengetahuan' => 'required|integer',
-      'fashohah' => 'required|integer',
-      'tajwid' => 'required|integer',
-    ]);
-
-    // Ambil data dari sesi untuk data awal
-    $guruId = session('id_guru');
-    $grupSantri = session('grup_santri');
-    $idSantri = session('id_santri');
-    $tanggal = session('tanggal');
-    $juz = session('juz');
-    $idJuz = session('id_juz');
-
-    // Cek apakah sudah ada nilai santri untuk surah yang sama
-    $exists = DB::table('nilai_mtahfidz')
-      ->where('id_santri', $idSantri)
-      ->where('id_juz_level', $request->id_juz_level)
-      ->exists();
-
-      if ($exists) {
-        return redirect()->back()->with('error', 'Santri Sudah Memiliki Nilai Pada Surah yang Sama');
-    }
-
-    // Ambil data nama grup, santri, juz dan level
-    $namaGrup = DB::table('grup_santri')
-          ->where('id', $grupSantri)
-          ->first(['id', 'nama_grup']);
-
-    $namaSantri = DB::table('data_santri')
-          ->where('id', $idSantri)
-          ->first(['id', 'id_grup_santri', 'nama_lengkap']);
-
-    $namaJuz = DB::table('juz')
-          ->where('id', $juz)
-          ->first(['id', 'nama_juz']);
-
-    $namaLevel = DB::table('juz_level')
-          ->where('id', $idJuz)
-          ->first(['id', 'id_juz', 'level']);
-
-    // Cek data dalam session
-    if ($namaGrup->isNotEmpty() && $namaSantri->isNotEmpty() && $namaJuz->isNotEmpty() && $namaLevel->isNotEmpty()) {
-      session([
-        'namaGrup' => $namaGrup,
-        'namaSantri' => $namaSantri,
-        'namaJuz' => $namaJuz,
-        'namaLevel' => $namaLevel,
-      ]);
-    } else {
-      return redirect()->back()->with('error', 'Data Kosong');
-    }
-    
-    // Simpan data lanjutan dengan informasi surah
-    DB::table('nilai_mtahfidz')->insert([
-          'id_guru' => $guruId,
-          'id_santri' => $idSantri,
-          'tanggal' => $tanggal,
-          'juz' => $juz,
-          'id_juz' => $idJuz,
-          'id_juz_level' => $request->id_juz_level,
-          'pengetahuan' => $request->pengetahuan,
-          'fashohah' => $request->fashohah,
-          'tajwid' => $request->tajwid,
-          'created_at' => now(),
-          'updated_at' => now(),
-    ]);
-
-    // Update selected_surah di session
-    $selectedSurah = session('selected_surah', []);
-    $selectedSurah[] = $request->id_juz_level;
-    session(['selected_surah' => $selectedSurah]);
-
-    return redirect()->back()->with('success', 'Penilaian berhasil disimpan, lanjutkan penilaian!');
-  }
-
-  // Reset data untuk menambahkan data baru m_tahfidz
-  public function tambahDataAwal()
-  {
-      // Hapus data session jika ada dan arahkan ke halaman input awal
-      session()->forget('nilaiId', 'namaGrup', 'namaSantri', 'namaJuz', 'namaLevel');
-      return redirect()->route('guru.munaqasyahTahfidz');
-  }
-
-  public function hapusMTahfidz($id)
-  {
-    // Cari data berdasarkan ID
-    $data = DB::table('nilai_mtahfidz')->where('id', $id)->first();
-
-    if (!$data) {
-      return redirect()->back()->with('error', 'Data tidak ditemukan.');
-    }
-
-    // Hapus data
-    DB::table('nilai_mtahfidz')->where('id', $id)->delete();
-
-    return redirect()->back()->with('success', 'Data berhasil dihapus.');
-  }
-
+  ##### ---------- Controller Get Data ---------- #####
   public function getGrupCabang()
   {
     // Ambil data dari tabel kelas
@@ -1116,6 +1659,7 @@ class KelolaDataRaport extends Controller
     return response()->json($dataSurah);
   }
 
+  ##### ---------- Controller Updated Dropdown ---------- #####
   public function updateSantriData()
   {
       // Ambil id_juz dari session

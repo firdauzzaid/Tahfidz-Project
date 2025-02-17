@@ -28,118 +28,118 @@
                 <div class="card-body">
                     <h3>Perkembangan Tahsin</h3>
                     @if(!session('nilaiId'))
-                    <form action="/simpan-perkembangan-tahsin" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="grupCabangTahsin" class="form-label">Kelas</label>
-                            <select class="form-select" id="grupCabangTahsin" name="grup_cabang" required>
-                                <option selected>Pilih Kelas</option>
-                                <!-- Options Here -->
-                            </select>
-                        </div>
+                        <form action="/simpan-perkembangan-tahsin" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="grupCabangTahsin" class="form-label">Kelas</label>
+                                <select class="form-select" id="grupCabangTahsin" name="grup_cabang" required>
+                                    <option selected>Pilih Kelas</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="grupSantriTahsin" class="form-label">Rombel</label>
-                            <select class="form-select" id="grupSantriTahsin" name="grup_santri" required>
-                                <option selected>Pilih Rombel</option>
-                                <!-- Options Here -->
-                            </select>
-                        </div>
+                            <div class="mb-3">
+                                <label for="grupSantriTahsin" class="form-label">Rombel</label>
+                                <select class="form-select" id="grupSantriTahsin" name="grup_santri" required>
+                                    <option selected>Pilih Rombel</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="grupKelompokTahsin" class="form-label">Kelompok Qur'an</label>
-                            <select class="form-select" id="grupKelompokTahsin" name="grup_kelompok" required>
-                                <option selected>Pilih Kelompok Qur'an</option>
-                                <!-- Options Here -->
-                            </select>
-                        </div>
+                            <div class="mb-3">
+                                <label for="grupKelompokTahsin" class="form-label">Kelompok Qur'an</label>
+                                <select class="form-select" id="grupKelompokTahsin" name="grup_kelompok" required>
+                                    <option selected>Pilih Kelompok Qur'an</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="dataSantriTahsin" class="form-label">Data Santri</label>
-                            <select class="form-select" id="dataSantriTahsin" name="id_santri" required>
-                                <option selected>Pilih Data Santri</option>
-                                <!-- Options Here -->
-                            </select>
-                        </div>
+                            <div class="mb-3">
+                                <label for="dataSantriTahsin" class="form-label">Data Santri</label>
+                                <select class="form-select" id="dataSantriTahsin" name="id_santri" required>
+                                    <option selected>Pilih Data Santri</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="tanggal" class="form-label">Tanggal</label>
-                            <input type="date" class="form-control" id="tanggal" name="tanggal" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="tanggal" class="form-label">Tanggal</label>
+                                <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="jilid" class="form-label">Jilid</label>
-                            <input type="text" class="form-control" placeholder="Masukkan Jilid" id="jilid"
-                                name="jilid" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="jilid" class="form-label">Jilid</label>
+                                <input type="text" class="form-control" placeholder="Masukkan Jilid" id="jilid"
+                                    name="jilid" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="halaman" class="form-label">Halaman</label>
-                            <input type="text" class="form-control" placeholder="Masukkan Halaman" id="halaman"
-                                name="halaman" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="halaman" class="form-label">Halaman</label>
+                                <input type="text" class="form-control" placeholder="Masukkan Halaman" id="halaman"
+                                    name="halaman" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <input type="text" class="form-control" placeholder="Masukkan Keterangan" id="keterangan"
-                                name="keterangan" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="keterangan" class="form-label">Keterangan</label>
+                                <input type="text" class="form-control" placeholder="Masukkan Keterangan" id="keterangan"
+                                    name="keterangan" required>
+                            </div>
 
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
                     @else
-                    <!-- Penilaian data lanjutan -->
-                    <form action="/simpan-data-lanjutan-ptahsin" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="grupCabangTahsin" class="form-label">Kelas</label>
-                            <input type="text" class="form-select" id="grupCabangTahsin" value="{{ session('namaGrupCabang')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
-                        </div>
+                        <!-- Penilaian data lanjutan -->
+                        <form action="/simpan-data-lanjutan-ptahsin" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="grupCabangTahsin" class="form-label">Kelas</label>
+                                <input type="text" class="form-select" id="grupCabangTahsin" value="{{ session('namaGrupCabang')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="grupSantriTahsin" class="form-label">Rombel</label>
-                            <input type="text" class="form-select" id="grupSantriTahsin" value="{{ session('namaGrupSantri')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
-                        </div>
+                            <div class="mb-3">
+                                <label for="grupSantriTahsin" class="form-label">Rombel</label>
+                                <input type="text" class="form-select" id="grupSantriTahsin" value="{{ session('namaGrupSantri')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="grupKelompokTahsin" class="form-label">Kelompok Qur'an</label>
-                            <input type="text" class="form-select" id="grupKelompokTahsin" value="{{ session('namaGrupKelompok')->nama_kelompok ?? 'Data Tidak Ditemukan' }}" readonly>
-                        </div>
+                            <div class="mb-3">
+                                <label for="grupKelompokTahsin" class="form-label">Kelompok Qur'an</label>
+                                <input type="text" class="form-select" id="grupKelompokTahsin" value="{{ session('namaGrupKelompok')->nama_kelompok ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="santriUpdate" class="form-label">Data Santri</label>
-                            <select class="form-select" id="santriUpdate" name="id_santri" required>
-                                <option selected>Pilih Data Santri</option>
-                                <!-- Options Here -->
-                            </select>
-                        </div>
+                            <div class="mb-3">
+                                <label for="santriUpdate" class="form-label">Data Santri</label>
+                                <select class="form-select" id="santriUpdate" name="id_santri" required>
+                                    <option selected>Pilih Data Santri</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="tanggal" class="form-label">Tanggal</label>
-                            <input type="date" class="form-control" id="tanggal" name="tanggal" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="tanggal" class="form-label">Tanggal</label>
+                                <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="jilid" class="form-label">Jilid</label>
-                            <input type="text" class="form-control" placeholder="Masukkan Jilid" id="jilid"
-                                name="jilid" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="jilid" class="form-label">Jilid</label>
+                                <input type="text" class="form-control" placeholder="Masukkan Jilid" id="jilid"
+                                    name="jilid" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="halaman" class="form-label">Halaman</label>
-                            <input type="text" class="form-control" placeholder="Masukkan Halaman" id="halaman"
-                                name="halaman" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="halaman" class="form-label">Halaman</label>
+                                <input type="text" class="form-control" placeholder="Masukkan Halaman" id="halaman"
+                                    name="halaman" required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <input type="text" class="form-control" placeholder="Masukkan Keterangan" id="keterangan"
-                                name="keterangan" required>
-                        </div>
+                            <div class="mb-3">
+                                <label for="keterangan" class="form-label">Keterangan</label>
+                                <input type="text" class="form-control" placeholder="Masukkan Keterangan" id="keterangan"
+                                    name="keterangan" required>
+                            </div>
 
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <a href="{{ route('guru.tambahDataAwalPTahsin') }}" class="btn btn-secondary">Data Baru</a>
-                    </form>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('guru.tambahDataAwalPTahsin') }}" class="btn btn-secondary">Data Baru</a>
+                        </form>
                     @endif
                 </div>
             </div>
@@ -210,6 +210,13 @@
                                                     <div class="modal-body">
                                                         <!-- Form untuk edit -->
                                                         <div class="mb-3">
+                                                            <label for="dataSantriTahsin" class="form-label">Data Santri</label>
+                                                            <select class="form-select" id="dataSantriTahsin" name="id_santri" required>
+                                                                <option selected>{{ $item->nama_santri }}</option>
+                                                                <!-- Options Here -->
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
                                                             <label for="jilid" class="form-label">Jilid</label>
                                                             <input type="text" name="jilid" class="form-control"
                                                                 value="{{ $item->jilid }}" required>
@@ -274,6 +281,7 @@
             </div>
         </div>
     </div>
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>

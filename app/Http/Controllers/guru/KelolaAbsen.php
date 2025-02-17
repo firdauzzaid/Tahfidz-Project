@@ -40,6 +40,9 @@ class KelolaAbsen extends Controller
 
     public function simpanAbsensi(Request $request)
     {
+        // $userId = Auth::user()->id;
+        $guruId = Auth::user()->id;
+
         // Validasi input
         $validated = $request->validate([
             'status' => 'required|array', // Status harus berupa array
@@ -47,7 +50,6 @@ class KelolaAbsen extends Controller
             'tanggal_absensi' => 'nullable|date', // Tanggal boleh kosong
         ]);
     
-        $userId = Auth::user()->id;
         $tanggalAbsensi = $validated['tanggal_absensi'] ?? now()->toDateString(); // Gunakan tanggal sekarang jika kosong
     
         try {
@@ -55,7 +57,7 @@ class KelolaAbsen extends Controller
                 // Periksa apakah absensi sudah ada untuk santri dan tanggal tertentu
                 $existingAbsensi = DB::table('absen')
                     ->where('id_santri', $idSantri)
-                    ->where('id_guru', $userId)
+                    ->where('id_guru', $guruId)
                     ->where('tanggal_absensi', $tanggalAbsensi)
                     ->first();
     
@@ -70,8 +72,8 @@ class KelolaAbsen extends Controller
                 } else {
                     // Jika absensi belum ada, tambahkan data baru
                     DB::table('absen')->insert([
+                        'id_guru' => $guruId,
                         'id_santri' => $idSantri,
-                        'id_guru' => $userId,
                         'status' => $status,
                         'tanggal_absensi' => $tanggalAbsensi,
                         'created_at' => now(),
@@ -80,13 +82,11 @@ class KelolaAbsen extends Controller
                 }
             }
     
-            return redirect()->back()->with('success', 'Absensi berhasil disimpan.');
+            return redirect()->back()->with('success', 'Kehadiran berhasil disimpan.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menyimpan absensi: ' . $e->getMessage());
         }
     }
-
-
 
     public function editAbsensi(Request $request, $id)
     {

@@ -35,10 +35,26 @@
                         <form action="/simpan-munaqasyah-tahfidz" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="grupSantriTahfidz" class="form-label">Grup Santri</label>
+                                <label for="grupCabangTahfidz" class="form-label">Kelas</label>
+                                <select class="form-select" id="grupCabangTahfidz" name="grup_cabang" required>
+                                    <option selected>Pilih Kelas</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grupSantriTahfidz" class="form-label">Rombel</label>
                                 <select class="form-select" id="grupSantriTahfidz" name="grup_santri" required>
-                                    <option selected>Pilih Grup Santri</option>
-                                    <!-- Tambahkan options dari database -->
+                                    <option selected>Pilih Rombel</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grupKelompokTahfidz" class="form-label">Kelompok Qur'an</label>
+                                <select class="form-select" id="grupKelompokTahfidz" name="grup_kelompok" required>
+                                    <option selected>Pilih Kelompok Qur'an</option>
+                                    <!-- Options Here -->
                                 </select>
                             </div>
 
@@ -46,7 +62,7 @@
                                 <label for="dataSantriTahfidz" class="form-label">Data Santri</label>
                                 <select class="form-select" id="dataSantriTahfidz" name="id_santri" required>
                                     <option selected>Pilih Data Santri</option>
-                                    <!-- Tambahkan options dari database -->
+                                    <!-- Options Here -->
                                 </select>
                             </div>
 
@@ -101,13 +117,23 @@
                         <form action="/simpan-data-lanjutan-mtahfidz" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="grupSantriTahfidz" class="form-label">Grup Santri</label>
-                                <input type="text" class="form-control" id="grupSantriTahfidz" value="{{ session('namaGrup')[0]->nama_grup }}" readonly>
+                                <label for="grupCabangTahfidz" class="form-label">Kelas</label>
+                                <input type="text" class="form-select" id="grupCabangTahfidz" value="{{ session('namaGrupCabang')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grupSantriTahfidz" class="form-label">Rombel</label>
+                                <input type="text" class="form-select" id="grupSantriTahfidz" value="{{ session('namaGrupSantri')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grupKelompokTahfidz" class="form-label">Kelompok Qur'an</label>
+                                <input type="text" class="form-select" id="grupKelompokTahfidz" value="{{ session('namaGrupKelompok')->nama_kelompok ?? 'Data Tidak Ditemukan' }}" readonly>
                             </div>
 
                             <div class="mb-3">
                                 <label for="dataSantriTahfidz" class="form-label">Data Santri</label>
-                                <input type="text" class="form-control" id="dataSantriTahfidz" value="{{ session('namaSantri')[0]->nama_lengkap }}" readonly>
+                                <input type="text" class="form-control" id="dataSantriTahfidz" value="{{ session('namaSantri')->nama_lengkap ?? 'Data Tidak Ditemukan' }}" readonly>
                             </div>
 
                             <div class="mb-3">
@@ -117,12 +143,12 @@
 
                             <div class="mb-3">
                                 <label for="juz" class="form-label">Juz</label>
-                                <input type="text" class="form-control" id="juz" value="{{ session('namaJuz')[0]->nama_juz }}" readonly>
+                                <input type="text" class="form-control" id="juz" value="{{ session('namaJuz')->nama_juz ?? 'Data Tidak Ditemukan' }}" readonly>
                             </div>
 
                             <div class="mb-3">
                                 <label for="levelTahfidzUpdate" class="form-label">Level</label>
-                                <input type="text" class="form-control" id="levelTahfidzUpdate" value="{{ session('namaLevel')[0]->level }}" readonly>
+                                <input type="text" class="form-control" id="levelTahfidzUpdate" value="{{ session('namaLevel')->level ?? 'Data Tidak Ditemukan' }}" readonly>
                             </div>
 
                             <div class="mb-3">
@@ -148,7 +174,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary">Simpan Data</button>
-                            <a href="{{ route('guru.tambahDataAwal') }}" class="btn btn-secondary">Data Baru</a>
+                            <a href="{{ route('guru.tambahDataAwalMTahfidz') }}" class="btn btn-secondary">Data Baru</a>
                         </form>
                     @endif
                 </div>
@@ -242,21 +268,20 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
         $(document).ready(function() {
-            // Ambil data Grup Santri
+            // Ambil data Grup Cabang(Kelas)
             $.ajax({
-                url: "{{ route('getGrupSantri') }}",
+                url: "{{ route('getGrupCabang') }}",
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
                     // Hapus opsi lama kecuali opsi pertama
-                    $('#grupSantriTahfidz').find('option:not(:first)').remove();
+                    $('#grupCabangTahfidz').find('option:not(:first)').remove();
 
                     // Tambahkan opsi baru
                     $.each(data, function(key, value) {
-                        $('#grupSantriTahfidz').append(
+                        $('#grupCabangTahfidz').append(
                             `<option value="${value.id}">${value.nama_grup}</option>`);
                     });
                 },
@@ -265,8 +290,74 @@
                 }
             });
 
-            // Ambil Data Santri berdasarkan Grup Santri yang dipilih
+            // Ambil Data Grup Santri(Rombel) berdasarkan Grup Cabang(Kelas) yang dipilih
+            $('#grupCabangTahfidz').on('change', function() {
+                const idCabang = $(this).val();
+
+                if (idCabang) {
+                    $.ajax({
+                        url: `/get-data-grup-santri/${idCabang}`,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            // Hapus opsi lama kecuali opsi pertama
+                            $('#grupSantriTahfidz').find('option:not(:first)').remove();
+
+                            // Tambahkan opsi baru
+                            $.each(data, function(key, value) {
+                                $('#grupSantriTahfidz').append(
+                                    `<option value="${value.id}">${value.nama_grup}</option>`
+                                );
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching data santri:', error);
+                        }
+                    });
+                } else {
+                    // Kosongkan Data Santri jika Grup Santri tidak dipilih
+                    $('#grupSantriTahfidz').find('option:not(:first)').remove();
+                }
+            });
+
+            // Ambil Data Kelompok Qur'an berdasarkan Grup Santri(Rombel) yang dipilih
             $('#grupSantriTahfidz').on('change', function() {
+                const idKelompok = $(this).val();
+
+                if (idKelompok) {
+                    $.ajax({
+                        url: `/get-data-grup-kelompok/${idKelompok}`,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            // Hapus opsi lama kecuali opsi pertama
+                            $('#grupKelompokTahfidz').find('option:not(:first)').remove();
+
+                            if(data.length === 0){
+                                $('#grupKelompokTahfidz').append(
+                                    `<option value="" disabled>Data kelompok qur'an tidak ada</option>`
+                                );
+                            } else {
+                                // Tambahkan opsi baru
+                                $.each(data, function(key, value) {
+                                    $('#grupKelompokTahfidz').append(
+                                        `<option value="${value.id}">${value.nama_kelompok}</option>`
+                                    );
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching data santri:', error);
+                        }
+                    });
+                } else {
+                    // Kosongkan Data Santri jika Grup Santri tidak dipilih
+                    $('#grupKelompokTahfidz').find('option:not(:first)').remove();
+                }
+            });
+
+            // Ambil Data Santri berdasarkan Grup yang dipilih
+            $('#grupKelompokTahfidz').on('change', function() {
                 const grupSantriId = $(this).val();
 
                 if (grupSantriId) {
@@ -278,12 +369,19 @@
                             // Hapus opsi lama kecuali opsi pertama
                             $('#dataSantriTahfidz').find('option:not(:first)').remove();
 
-                            // Tambahkan opsi baru
-                            $.each(data, function(key, value) {
+                            // Jika data santri kosong, tampilkan pesan "Data santri tidak ada"
+                            if (data.length === 0) {
                                 $('#dataSantriTahfidz').append(
-                                    `<option value="${value.id}">${value.nama_lengkap}</option>`
+                                    `<option value="" disabled>Data santri tidak ada</option>`
                                 );
-                            });
+                            } else {
+                                // Tambahkan opsi baru jika ada data santri
+                                $.each(data, function(key, value) {
+                                    $('#dataSantriTahfidz').append(
+                                        `<option value="${value.id}">${value.nama_lengkap}</option>`
+                                    );
+                                });
+                            }
                         },
                         error: function(xhr, status, error) {
                             console.error('Error fetching data santri:', error);
@@ -348,23 +446,18 @@
                         type: "GET",
                         dataType: "json",
                         success: function(data) {
-                            // Hapus semua option kecuali yang pertama
                             $('#surah').find('option:not(:first)').remove();
-
-                            // Tambahkan options dari response data
-                            $.each(data, function(index, surah) {
+                            $.each(data, function(key, value) {
                                 $('#surah').append(
-                                    `<option value="${surah.id}">${surah.nama_surat}</option>`
+                                    `<option value="${value.id}">${value.nama_surat}</option>`
                                 );
                             });
                         },
                         error: function(xhr, status, error) {
                             console.error('Error fetching surah:', error);
-                            alert('Gagal mengambil data surah. Silakan coba lagi.');
                         }
                     });
                 } else {
-                    // Hapus semua option kecuali yang pertama jika tidak ada level yang dipilih
                     $('#surah').find('option:not(:first)').remove();
                 }
             });

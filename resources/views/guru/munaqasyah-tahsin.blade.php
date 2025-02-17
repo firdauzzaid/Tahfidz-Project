@@ -27,41 +27,104 @@
             <div class="card">
                 <div class="card-body">
                     <h3>Munaqasyah Tahsin (Data Raport)</h3>
-                    <form action="/simpan-munaqasyah-tahsin" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="grupSantriTahsin" class="form-label">Grup Santri</label>
-                            <select class="form-select" id="grupSantriTahsin" name="grup_santri">
-                                <option selected>Pilih Grup Santri</option>
-                                <!-- Options Here -->
-                            </select>
-                        </div>
+                    @if(!session('nilaiId'))
+                        <form action="/simpan-munaqasyah-tahsin" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="grupCabangTahsin" class="form-label">Kelas</label>
+                                <select class="form-select" id="grupCabangTahsin" name="grup_cabang" required>
+                                    <option selected>Pilih Kelas</option>
+                                    <!-- Options Here -->
+                                    </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="dataSantriTahsin" class="form-label">Data Santri</label>
-                            <select class="form-select" id="dataSantriTahsin" name="id_santri">
-                                <option selected>Pilih Data Santri</option>
-                                <!-- Options Here -->
-                            </select>
-                        </div>
+                            <div class="mb-3">
+                                <label for="grupSantriTahsin" class="form-label">Rombel</label>
+                                <select class="form-select" id="grupSantriTahsin" name="grup_santri" required>
+                                    <option selected>Pilih Rombel</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="jilid" class="form-label">Jilid</label>
-                            <input type="text" class="form-control" id="jilid" name="jilid">
-                        </div>
+                            <div class="mb-3">
+                                <label for="grupKelompokTahsin" class="form-label">Kelompok Qur'an</label>
+                                <select class="form-select" id="grupKelompokTahsin" name="grup_kelompok" required>
+                                    <option selected>Pilih Kelompok Qur'an</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="level" class="form-label">Halaman</label>
-                            <input type="text" class="form-control" id="level" name="level">
-                        </div>
+                            <div class="mb-3">
+                                <label for="dataSantriTahsin" class="form-label">Data Santri</label>
+                                <select class="form-select" id="dataSantriTahsin" name="id_santri" required>
+                                    <option selected>Pilih Data Santri</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="nilai" class="form-label">Nilai</label>
-                            <input type="text" class="form-control" id="nilai" name="nilai">
-                        </div>
+                            <div class="mb-3">
+                                <label for="jilid" class="form-label">Jilid</label>
+                                <input type="text" class="form-control" id="jilid" name="jilid">
+                            </div>
 
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+                            <div class="mb-3">
+                                <label for="level" class="form-label">Halaman</label>
+                                <input type="text" class="form-control" id="level" name="level">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="nilai" class="form-label">Nilai</label>
+                                <input type="text" class="form-control" id="nilai" name="nilai">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    @else
+                        <!-- Simpan data lanjutan -->
+                        <form action="/simpan-data-lanjutan-mtahsin" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="grupCabangTahsin" class="form-label">Kelas</label>
+                                <input type="text" class="form-select" id="grupCabangTahsin" value="{{ session('namaGrupCabang')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grupSantriTahsin" class="form-label">Rombel</label>
+                                <input type="text" class="form-select" id="grupSantriTahsin" value="{{ session('namaGrupSantri')->nama_grup ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grupKelompokTahsin" class="form-label">Kelompok Qur'an</label>
+                                <input type="text" class="form-select" id="grupKelompokTahsin" value="{{ session('namaGrupKelompok')->nama_kelompok ?? 'Data Tidak Ditemukan' }}" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="santriUpdate" class="form-label">Data Santri</label>
+                                <select class="form-select" id="santriUpdate" name="id_santri" required>
+                                    <option selected>Pilih Data Santri</option>
+                                    <!-- Options Here -->
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="jilid" class="form-label">Jilid</label>
+                                <input type="text" class="form-control" id="jilid" name="jilid">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="level" class="form-label">Halaman</label>
+                                <input type="text" class="form-control" id="level" name="level">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="nilai" class="form-label">Nilai</label>
+                                <input type="text" class="form-control" id="nilai" name="nilai">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('guru.tambahDataAwalMTahsin') }}" class="btn btn-secondary">Data Baru</a>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
@@ -145,22 +208,23 @@
             </div>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            // Ambil data Grup Santri
+            // Ambil data Grup Cabang(Kelas)
             $.ajax({
-                url: "{{ route('getGrupSantri') }}",
+                url: "{{ route('getGrupCabang') }}",
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
                     // Hapus opsi lama kecuali opsi pertama
-                    $('#grupSantriTahsin').find('option:not(:first)').remove();
+                    $('#grupCabangTahsin').find('option:not(:first)').remove();
 
                     // Tambahkan opsi baru
                     $.each(data, function(key, value) {
-                        $('#grupSantriTahsin').append(
+                        $('#grupCabangTahsin').append(
                             `<option value="${value.id}">${value.nama_grup}</option>`);
                     });
                 },
@@ -169,8 +233,74 @@
                 }
             });
 
-            // Ambil Data Santri berdasarkan Grup Santri yang dipilih
+            // Ambil Data Grup Santri(Rombel) berdasarkan Grup Cabang(Kelas) yang dipilih
+            $('#grupCabangTahsin').on('change', function() {
+                const idCabang = $(this).val();
+
+                if (idCabang) {
+                    $.ajax({
+                        url: `/get-data-grup-santri/${idCabang}`,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            // Hapus opsi lama kecuali opsi pertama
+                            $('#grupSantriTahsin').find('option:not(:first)').remove();
+
+                            // Tambahkan opsi baru
+                            $.each(data, function(key, value) {
+                                $('#grupSantriTahsin').append(
+                                    `<option value="${value.id}">${value.nama_grup}</option>`
+                                );
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching data santri:', error);
+                        }
+                    });
+                } else {
+                    // Kosongkan Data Santri jika Grup Santri tidak dipilih
+                    $('#grupSantriTahsin').find('option:not(:first)').remove();
+                }
+            });
+
+            // Ambil Data Kelompok Qur'an berdasarkan Grup Santri(Rombel) yang dipilih
             $('#grupSantriTahsin').on('change', function() {
+                const idKelompok = $(this).val();
+
+                if (idKelompok) {
+                    $.ajax({
+                        url: `/get-data-grup-kelompok/${idKelompok}`,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            // Hapus opsi lama kecuali opsi pertama
+                            $('#grupKelompokTahsin').find('option:not(:first)').remove();
+
+                            if(data.length === 0){
+                                $('#grupKelompokTahsin').append(
+                                    `<option value="" disabled>Data kelompok qur'an tidak ada</option>`
+                                );
+                            } else {
+                                // Tambahkan opsi baru
+                                $.each(data, function(key, value) {
+                                    $('#grupKelompokTahsin').append(
+                                        `<option value="${value.id}">${value.nama_kelompok}</option>`
+                                    );
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching data santri:', error);
+                        }
+                    });
+                } else {
+                    // Kosongkan Data Santri jika Grup Santri tidak dipilih
+                    $('#grupKelompokTahsin').find('option:not(:first)').remove();
+                }
+            });
+
+            // Ambil Data Santri berdasarkan Grup yang dipilih
+            $('#grupKelompokTahsin').on('change', function() {
                 const grupSantriId = $(this).val();
 
                 if (grupSantriId) {
@@ -182,12 +312,19 @@
                             // Hapus opsi lama kecuali opsi pertama
                             $('#dataSantriTahsin').find('option:not(:first)').remove();
 
-                            // Tambahkan opsi baru
-                            $.each(data, function(key, value) {
+                            // Jika data santri kosong, tampilkan pesan "Data santri tidak ada"
+                            if (data.length === 0) {
                                 $('#dataSantriTahsin').append(
-                                    `<option value="${value.id}">${value.nama_lengkap}</option>`
+                                    `<option value="" disabled>Data santri tidak ada</option>`
                                 );
-                            });
+                            } else {
+                                // Tambahkan opsi baru jika ada data santri
+                                $.each(data, function(key, value) {
+                                    $('#dataSantriTahsin').append(
+                                        `<option value="${value.id}">${value.nama_lengkap}</option>`
+                                    );
+                                });
+                            }
                         },
                         error: function(xhr, status, error) {
                             console.error('Error fetching data santri:', error);
@@ -198,6 +335,51 @@
                     $('#dataSantriTahsin').find('option:not(:first)').remove();
                 }
             });
-        });
+
+            // Ambil data Dropdown Surah Update berdasarkan id_juz_level yang dipilih
+            const updateSantriDropdown = () => {
+                    fetch('/update-santri-data', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        },
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then((data) => {
+                            if (data.success && Array.isArray(data.santri_data) && data.santri_data.length > 0) {
+                                
+                                const santriDropdown = $('#santriUpdate');
+                                const selectedSantri = sessionStorage.getItem('selected_santri')
+                                    ? JSON.parse(sessionStorage.getItem('selected_santri'))
+                                    : [];
+                                
+                                santriDropdown.empty();
+
+                                data.santri_data.forEach((santri) => {
+                                    if (!selectedSantri.includes(santri.id)) {
+                                        santriDropdown.append(
+                                            `<option value="${santri.id}">${santri.nama_lengkap}</option>`
+                                        );
+                                    }
+                                });
+
+                                // alert('Dropdown surah berhasil diperbarui!');
+                            } else {
+                                // alert(data.message || 'Tidak ada data surah yang tersedia.');
+                            }
+                        })
+                        .catch((error) => {
+                            // console.error('Error updating surah data:', error);
+                            // alert('Terjadi kesalahan saat memperbarui data surah.');
+                        });
+                };
+                updateSantriDropdown();
+            });
     </script>
 @endsection

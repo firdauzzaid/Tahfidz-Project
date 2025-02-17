@@ -31,22 +31,24 @@
                         @csrf
                         <!-- Dropdown Grup Santri -->
                         <div class="mb-3">
-                            <label for="grupSantriTahsin" class="form-label">Grup Kelas</label>
-                            <select class="form-select" id="grupSantriTahsin" name="grup_cabang" required>
+                            <label for="grupCabangAbsen" class="form-label">Kelas</label>
+                                <select class="form-select" id="grupCabangAbsen" name="grup_cabang" required>
                                 <option selected>Pilih Kelas</option>
                                 <!-- Options Here -->
                             </select>
                         </div>
+
                         <div class="mb-3">
-                            <label for="grupSantriTahsin" class="form-label">Rombel</label>
-                            <select class="form-select" id="grupSantriTahsin" name="grup_cabang" required>
+                            <label for="grupSantriAbsen" class="form-label">Rombel</label>
+                            <select class="form-select" id="grupSantriAbsen" name="grup_santri" required>
                                 <option selected>Pilih Rombel</option>
                                 <!-- Options Here -->
                             </select>
                         </div>
+
                         <div class="mb-3">
-                            <label for="grupSantriTahsin" class="form-label">Kelompok Qur'an</label>
-                            <select class="form-select" id="grupSantriTahsin" name="grup_cabang" required>
+                            <label for="grupKelompokAbsen" class="form-label">Kelompok Qur'an</label>
+                            <select class="form-select" id="grupKelompokAbsen" name="grup_kelompok" required>
                                 <option selected>Pilih Kelompok Qur'an</option>
                                 <!-- Options Here -->
                             </select>
@@ -85,6 +87,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-12">
             <div class="card">
                 <h3 class="p-3 text-center">Daftar Siswa - Kelola Absen</h3>
@@ -224,74 +227,139 @@
             </div>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-    // Ambil data Grup Santri
-    $.ajax({
-        url: "{{ route('getGrupSantri') }}",
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-            // Hapus opsi lama kecuali opsi pertama
-            $('#grupSantriTahsin').find('option:not(:first)').remove();
-
-            // Tambahkan opsi baru
-            $.each(data, function(key, value) {
-                $('#grupSantriTahsin').append(
-                    `<option value="${value.id}">${value.nama_grup}</option>`);
-            });
-        },
-        error: function(xhr, status, error) {
-            console.error('Error fetching grup santri:', error);
-        }
-    });
-
-    // Ambil Data Santri berdasarkan Grup Santri yang dipilih
-    $('#grupSantriTahsin').on('change', function() {
-        const grupSantriId = $(this).val();
-
-        if (grupSantriId) {
+    <script>
+        $(document).ready(function() {
+        // Ambil data Grup Cabang(Kelas)
             $.ajax({
-                url: `/get-data-santri-by-grup/${grupSantriId}`,
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    // Kosongkan tabel data santri
-                    const tbody = $('#dataSantriTable tbody');
-                    tbody.empty();
+                    url: "{{ route('getGrupCabang') }}",
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        // Hapus opsi lama kecuali opsi pertama
+                        $('#grupCabangAbsen').find('option:not(:first)').remove();
 
-                    // Tambahkan baris baru untuk setiap santri
-                    $.each(data, function(key, value) {
-                        const row = `
-                            <tr>
-                                <td>${value.nama_lengkap}</td>
-                                <td>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="status[${value.id}]" value="1" required>
-                                        <label class="form-check-label">Ya</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="status[${value.id}]" value="0" required>
-                                        <label class="form-check-label">Tidak</label>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                        tbody.append(row);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching data santri:', error);
+                        // Tambahkan opsi baru
+                        $.each(data, function(key, value) {
+                            $('#grupCabangAbsen').append(
+                                `<option value="${value.id}">${value.nama_grup}</option>`);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching grup santri:', error);
+                    }
+            });
+
+            // Ambil Data Grup Santri(Rombel) berdasarkan Grup Cabang(Kelas) yang dipilih
+                $('#grupCabangAbsen').on('change', function() {
+                        const idCabang = $(this).val();
+
+                        if (idCabang) {
+                            $.ajax({
+                                url: `/get-data-grup-santri/${idCabang}`,
+                                type: "GET",
+                                dataType: "json",
+                                success: function(data) {
+                                    // Hapus opsi lama kecuali opsi pertama
+                                    $('#grupSantriAbsen').find('option:not(:first)').remove();
+
+                                    // Tambahkan opsi baru
+                                    $.each(data, function(key, value) {
+                                        $('#grupSantriAbsen').append(
+                                            `<option value="${value.id}">${value.nama_grup}</option>`
+                                        );
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error fetching data santri:', error);
+                                }
+                            });
+                        } else {
+                            // Kosongkan Data Santri jika Grup Santri tidak dipilih
+                            $('#grupSantriAbsen').find('option:not(:first)').remove();
+                        }
+            });
+
+            // Ambil Data Kelompok Qur'an berdasarkan Grup Santri(Rombel) yang dipilih
+            $('#grupSantriAbsen').on('change', function() {
+                const idKelompok = $(this).val();
+
+                if (idKelompok) {
+                            $.ajax({
+                                url: `/get-data-grup-kelompok/${idKelompok}`,
+                                type: "GET",
+                                dataType: "json",
+                                success: function(data) {
+                                    // Hapus opsi lama kecuali opsi pertama
+                                    $('#grupKelompokAbsen').find('option:not(:first)').remove();
+
+                                    if(data.length === 0){
+                                        $('#grupKelompokTahfidz').append(
+                                            `<option value="" disabled>Data kelompok qur'an tidak ada</option>`
+                                        );
+                                    } else {
+                                        // Tambahkan opsi baru
+                                        $.each(data, function(key, value) {
+                                            $('#grupKelompokAbsen').append(
+                                                `<option value="${value.id}">${value.nama_kelompok}</option>`
+                                            );
+                                        });
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error fetching data santri:', error);
+                                }
+                            });
+                } else {
+                    // Kosongkan Data Santri jika Grup Santri tidak dipilih
+                    $('#grupKelompokAbsen').find('option:not(:first)').remove();
                 }
             });
-        } else {
-            // Kosongkan tabel jika Grup Santri tidak dipilih
-            $('#dataSantriTable tbody').empty();
-        }
-    });
-});
 
-</script>
+            // Ambil Data Santri berdasarkan Grup Santri yang dipilih
+            $('#grupKelompokAbsen').on('change', function() {
+                const grupSantriId = $(this).val();
+
+                if (grupSantriId) {
+                    $.ajax({
+                        url: `/get-data-santri-by-grup/${grupSantriId}`,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            // Kosongkan tabel data santri
+                            const tbody = $('#dataSantriTable tbody');
+                            tbody.empty();
+
+                            // Tambahkan baris baru untuk setiap santri
+                            $.each(data, function(key, value) {
+                                const row = `
+                                    <tr>
+                                        <td>${value.nama_lengkap}</td>
+                                        <td>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="status[${value.id}]" value="1" required>
+                                                <label class="form-check-label">Ya</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="status[${value.id}]" value="0" required>
+                                                <label class="form-check-label">Tidak</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                                tbody.append(row);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching data santri:', error);
+                        }
+                    });
+                } else {
+                    // Kosongkan tabel jika Grup Santri tidak dipilih
+                    $('#dataSantriTable tbody').empty();
+                }
+            });
+        });
+    </script>
 @endsection
