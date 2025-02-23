@@ -143,24 +143,14 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <div class="mb-3">
-                                                                <label for="editGrupSantri{{ $item->id }}" class="form-label">Grup Santri</label>
-                                                                <select class="form-select" id="editGrupSantri{{ $item->id }}" name="grup_santri">
-                                                                    <option value="" disabled>Pilih Grup Santri</option>
-                                                                    @foreach($grupSantri as $grup)
-                                                                        <option value="{{ $grup->id }}" {{ $grup->id == $item->id ? 'selected' : '' }}>
-                                                                            {{ $grup->nama_grup }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
                                                                 <label for="editDataSantri{{ $item->id }}" class="form-label">Data Santri</label>
-                                                                <select class="form-select" id="editDataSantri{{ $item->id }}" name="id_santri">
-                                                                    <option value="" disabled>Pilih Data Santri</option>
+                                                                <select class="form-select" id="editDataSantri{{ $item->id }}" name="id_santri" disabled>
                                                                     @foreach($dataSantri as $santri)
-                                                                        <option value="{{ $santri->id }}" {{ $santri->id == $item->id_santri ? 'selected' : '' }}>
-                                                                            {{ $santri->nama_lengkap }}
-                                                                        </option>
+                                                                        @if($santri->id == $item->id_santri)
+                                                                            <option value="{{ $santri->id }}" selected>
+                                                                                {{ $santri->nama_lengkap }}
+                                                                            </option>
+                                                                        @endif
                                                                     @endforeach
                                                                 </select>
                                                             </div>

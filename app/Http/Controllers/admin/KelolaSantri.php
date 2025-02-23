@@ -163,137 +163,149 @@ class KelolaSantri extends Controller
    */
   public function store(Request $request)
   {
-    $userID = $request->id;
+      // Ambil ID pengguna (jika ada)
+      $userID = $request->id;
 
       try {
-        if ($userID) {
+          DB::beginTransaction();
+
           // Validasi input
           $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'no_identitas' => 'required|string|max:50|unique:data_santri,no_identitas',
-            'alamat' => 'required|string|max:255',
-            'tgl_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|string|in:Laki-Laki,Perempuan',
-            'keterangan' => 'nullable|string|max:255',
-            'grup_cabang' => 'required|exists:grup_cabang,id',
-            'grup_santri' => 'required|exists:grup_santri,id',
-            'grup_kelompok' => 'required|exists:grup_kelompok,id',
-            'status' => 'required|in:0,1',
-            'nama_wali_ayah' => 'required|string|max:255',
-            'telepon_wali_ayah' => 'required|string|max:15',
-            'alamat_wali_ayah' => 'required|string|max:255',
-            'nama_wali_ibu' => 'required|string|max:255',
-            'telepon_wali_ibu' => 'required|string|max:15',
-            'alamat_wali_ibu' => 'required|string|max:255',
+              'nama_lengkap' => 'required|string|max:255',
+              'no_identitas' => $userID
+                  ? "required|string|max:50|unique:data_santri,no_identitas,{$userID}"
+                  : 'required|string|max:50|unique:data_santri,no_identitas',
+              'alamat' => 'required|string|max:255',
+              'tgl_lahir' => 'required|date',
+              'jenis_kelamin' => 'required|string|in:Laki-Laki,Perempuan',
+              'keterangan' => 'nullable|string|max:255',
+              'grup_cabang' => 'required|exists:grup_cabang,id',
+              'grup_santri' => 'required|exists:grup_santri,id',
+              'grup_kelompok' => 'required|exists:kelompok_quran,id',
+              'status' => 'required|in:0,1',
+              'nama_wali_ayah' => 'required|string|max:255',
+              'telepon_wali_ayah' => 'required|string|max:15',
+              'alamat_wali_ayah' => 'required|string|max:255',
+              'nama_wali_ibu' => 'required|string|max:255',
+              'telepon_wali_ibu' => 'required|string|max:15',
+              'alamat_wali_ibu' => 'required|string|max:255',
           ]);
-        }
 
-        DB::beginTransaction();
+          // Jika userID ada, perbarui data santri
+          if ($userID) {
+              DB::table('data_santri')
+                  ->where('id', $userID)
+                  ->update([
+                      'nama_lengkap' => $validated['nama_lengkap'],
+                      'no_identitas' => $validated['no_identitas'],
+                      'alamat' => $validated['alamat'],
+                      'tgl_lahir' => $validated['tgl_lahir'],
+                      'jenis_kelamin' => $validated['jenis_kelamin'],
+                      'keterangan' => $validated['keterangan'],
+                      'id_grup_cabang' => $validated['grup_cabang'],
+                      'id_grup_santri' => $validated['grup_santri'],
+                      'id_grup_kelompok' => $validated['grup_kelompok'],
+                      'status' => $validated['status'],
+                      'updated_at' => now(),
+                  ]);
 
-        // Validasi kuota grup santri
-        $totalSantri = DB::table('data_santri')->where('id_grup_santri', $validated['grup_santri'])->count();
-        $maxKuota = DB::table('grup_santri')->where('id', $validated['grup_santri'])->value('jumlah_maksimal');
+              DB::commit();
+              return response()->json(['message' => 'Data santri berhasil diperbarui', 'status' => 'updated']);
+          }
 
-        if ($totalSantri >= $maxKuota) {
-            return response()->json(['message' => 'Kuota grup santri penuh', 'status' => 'quota_full'], 422);
-        }
+          // Validasi kuota grup santri
+          $totalSantri = DB::table('data_santri')
+              ->where('id_grup_santri', $validated['grup_santri'])
+              ->count();
 
-        // Simpan data santri
-        $santriId = DB::table('data_santri')->insertGetId([
-            'nama_lengkap' => $validated['nama_lengkap'],
-            'no_identitas' => $validated['no_identitas'],
-            'alamat' => $validated['alamat'],
-            'tgl_lahir' => $validated['tgl_lahir'],
-            'jenis_kelamin' => $validated['jenis_kelamin'],
-            'keterangan' => $validated['keterangan'],
-            'id_grup_cabang' => $validated['grup_cabang'],
-            'id_grup_santri' => $validated['grup_santri'],
-            'id_grup_kelompok' => $validated['grup_kelompok'],
-            'status' => $validated['status'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+          $maxKuota = DB::table('grup_santri')
+              ->where('id', $validated['grup_santri'])
+              ->value('jumlah_maksimal');
 
-        // Buat username wali
-        $usernameWaliAyah = strtolower(str_replace(' ', '', $validated['nama_wali_ayah'])) . rand(100, 999);
-        $usernameWaliIbu = strtolower(str_replace(' ', '', $validated['nama_wali_ibu'])) . rand(100, 999);
+          if ($totalSantri >= $maxKuota) {
+              return response()->json(['message' => 'Kuota grup santri penuh', 'status' => 'quota_full'], 422);
+          }
 
-        // Simpan data wali
-        $waliAyahId = DB::table('data_walisantri')->insertGetId([
-            'id_santri' => $santriId,
-            'no_identitas' => $usernameWaliAyah,
-            'hubungan' => 'Ayah',
-            'nama_wali' => $validated['nama_wali_ayah'],
-            'telepon' => $validated['telepon_wali_ayah'],
-            'alamat' => $validated['alamat_wali_ayah'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+          // Simpan data santri baru
+          $santriId = DB::table('data_santri')->insertGetId([
+              'nama_lengkap' => $validated['nama_lengkap'],
+              'no_identitas' => $validated['no_identitas'],
+              'alamat' => $validated['alamat'],
+              'tgl_lahir' => $validated['tgl_lahir'],
+              'jenis_kelamin' => $validated['jenis_kelamin'],
+              'keterangan' => $validated['keterangan'],
+              'id_grup_cabang' => $validated['grup_cabang'],
+              'id_grup_santri' => $validated['grup_santri'],
+              'id_grup_kelompok' => $validated['grup_kelompok'],
+              'status' => $validated['status'],
+              'created_at' => now(),
+              'updated_at' => now(),
+          ]);
 
-        $waliIbuId = DB::table('data_walisantri')->insertGetId([
-            'id_santri' => $santriId,
-            'no_identitas' => $usernameWaliIbu,
-            'hubungan' => 'Ibu',
-            'nama_wali' => $validated['nama_wali_ibu'],
-            'telepon' => $validated['telepon_wali_ibu'],
-            'alamat' => $validated['alamat_wali_ibu'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+          // Buat username wali
+          $usernameWaliAyah = strtolower(str_replace(' ', '', $validated['nama_wali_ayah'])) . rand(100, 999);
+          $usernameWaliIbu = strtolower(str_replace(' ', '', $validated['nama_wali_ibu'])) . rand(100, 999);
 
-        // Buat akun untuk wali
-        DB::table('users')->insert([
-            [
-                'username' => $usernameWaliAyah,
-                'id_wali' => $waliAyahId,
-                'nama_lengkap' => $validated['nama_wali_ayah'],
-                'email' => $usernameWaliAyah . '@gmail.com',
-                'password' => bcrypt($usernameWaliAyah),
-                'level' => 2,
-                'status' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'username' => $usernameWaliIbu,
-                'id_wali' => $waliIbuId,
-                'nama_lengkap' => $validated['nama_wali_ibu'],
-                'email' => $usernameWaliIbu . '@gmail.com',
-                'password' => bcrypt($usernameWaliIbu),
-                'level' => 2,
-                'status' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        ]);
-        
-        DB::commit();
+          // Simpan data wali
+          $waliAyahId = DB::table('data_walisantri')->insertGetId([
+              'id_santri' => $santriId,
+              'no_identitas' => $usernameWaliAyah,
+              'hubungan' => 'Ayah',
+              'nama_wali' => $validated['nama_wali_ayah'],
+              'telepon' => $validated['telepon_wali_ayah'],
+              'alamat' => $validated['alamat_wali_ayah'],
+              'created_at' => now(),
+              'updated_at' => now(),
+          ]);
 
-        dd();
+          $waliIbuId = DB::table('data_walisantri')->insertGetId([
+              'id_santri' => $santriId,
+              'no_identitas' => $usernameWaliIbu,
+              'hubungan' => 'Ibu',
+              'nama_wali' => $validated['nama_wali_ibu'],
+              'telepon' => $validated['telepon_wali_ibu'],
+              'alamat' => $validated['alamat_wali_ibu'],
+              'created_at' => now(),
+              'updated_at' => now(),
+          ]);
 
-        return response()->json(['message' => 'Data santri dan wali berhasil ditambahkan', 'status' => 'created']);
+          // Buat akun untuk wali
+          DB::table('users')->insert([
+              [
+                  'username' => $usernameWaliAyah,
+                  'id_wali' => $waliAyahId,
+                  'nama_lengkap' => $validated['nama_wali_ayah'],
+                  'email' => $usernameWaliAyah . '@gmail.com',
+                  'password' => bcrypt($usernameWaliAyah),
+                  'level' => 2,
+                  'status' => 1,
+                  'created_at' => now(),
+                  'updated_at' => now(),
+              ],
+              [
+                  'username' => $usernameWaliIbu,
+                  'id_wali' => $waliIbuId,
+                  'nama_lengkap' => $validated['nama_wali_ibu'],
+                  'email' => $usernameWaliIbu . '@gmail.com',
+                  'password' => bcrypt($usernameWaliIbu),
+                  'level' => 2,
+                  'status' => 1,
+                  'created_at' => now(),
+                  'updated_at' => now(),
+              ]
+          ]);
+
+          DB::commit();
+          return response()->json(['message' => 'Data santri dan wali berhasil ditambahkan', 'status' => 'created']);
       } catch (\Exception $e) {
           DB::rollBack();
-          return response()->json(['message' => 'Gagal menambahkan data', 'error' => $e->getMessage(), 'status' => 'create_failed'], 500);
-          // return response()->json(['message' => 'Gagal menambahkan data', 'error' => $e->getMessage(), 'status' => 'create_failed'], 500);
+          // Log::error('Error adding data: ' . $e->getMessage());
+          return response()->json([
+              'message' => 'Gagal menambahkan data',
+              'error' => $e->getMessage(),
+              'status' => 'create_failed'
+          ], 500);
       }
-  }  
-
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function edit($id): JsonResponse
-  {
-    $user = DB::table('data_santri')->where('id', $id)->first();
-
-    if ($user) {
-      return response()->json($user);
-    } else {
-      return response()->json(['message' => 'User not found'], 404);
-    }
   }
 
   /**
@@ -357,32 +369,73 @@ class KelolaSantri extends Controller
         ->select('no_identitas', 'nama_wali',  'telepon', 'alamat')
         ->first();
 
-      // Ambil data dari tabel grup_cabang
-      $grupCabang = DB::table('grup_cabang')
+      if ($waliAyah && $waliIbu) {
+        // Ambil data dari tabel grup_cabang
+        $grupCabang = DB::table('grup_cabang')
         ->select('id', 'nama_grup', 'alamat_grup')
         ->get();
 
-      // Ambil data dari tabel grup_santri
-      $grupSantri = DB::table('grup_santri')
-        ->select('id', 'nama_grup', 'jumlah_maksimal')
-        ->get();
+        // Ambil data dari tabel grup_santri
+        $grupSantri = DB::table('grup_santri')
+          ->select('id', 'nama_grup', 'jumlah_maksimal')
+          ->get();
 
-      $grupKelompok = DB::table('kelompok_quran')
-        ->select('id', 'nama_kelompok', 'jumlah')
-        ->get();
+        $grupKelompok = DB::table('kelompok_quran')
+          ->select('id', 'nama_kelompok', 'jumlah')
+          ->get();
 
-      // Kirim data ke view
-      return view('admin.detail-santri', [
-        'detailSantri' => $detailSantri,
-        'waliAyah' => $waliAyah,
-        'waliIbu' => $waliIbu,
-        'grupCabang' => $grupCabang,
-        'grupSantri' => $grupSantri,
-        'grupKelompok' =>$grupKelompok
-      ]);
+        // Kirim data ke view
+        return view('admin.detail-santri', [
+          'detailSantri' => $detailSantri,
+          'waliAyah' => $waliAyah,
+          'waliIbu' => $waliIbu,
+          'grupCabang' => $grupCabang,
+          'grupSantri' => $grupSantri,
+          'grupKelompok' =>$grupKelompok
+        ]);
+      } else {
+        return redirect()->route('admin.kelola-santri')->with('error', 'Wali Santri tidak ditemukan.');
+      }
     } else {
       // Jika data tidak ditemukan, redirect dengan pesan error
       return redirect()->route('admin.kelola-santri')->with('error', 'Santri tidak ditemukan.');
+    }
+  }
+
+  /**
+   * Show the form for editing the specified resource.
+   *
+   * @param  int  $id
+   * @return \Illuminate\Http\Response
+   */
+  public function edit($id): JsonResponse
+  {
+    $user = DB::table('data_santri')->where('id', $id)->first();
+
+    if ($user) {
+      // Ambil data wali santri (ayah)
+      $waliAyah = DB::table('data_walisantri')
+        ->where('id_santri', $id)
+        ->where('hubungan', 'Ayah')
+        ->first();
+
+      // Ambil data wali santri (ibu)
+      $waliIbu = DB::table('data_walisantri')
+        ->where('id_santri', $id)
+        ->where('hubungan', 'Ibu')
+        ->first();
+
+      // Gabungkan data santri dengan data wali
+      $user->nama_wali_ayah = $waliAyah ? $waliAyah->nama_wali : '';
+      $user->telepon_wali_ayah = $waliAyah ? $waliAyah->telepon : '';
+      $user->alamat_wali_ayah = $waliAyah ? $waliAyah->alamat : '';
+      $user->nama_wali_ibu = $waliIbu ? $waliIbu->nama_wali : '';
+      $user->telepon_wali_ibu = $waliIbu ? $waliIbu->telepon : '';
+      $user->alamat_wali_ibu = $waliIbu ? $waliIbu->alamat : '';
+      
+      return response()->json($user);
+    } else {
+      return response()->json(['message' => 'User not found'], 404);
     }
   }
 

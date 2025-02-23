@@ -229,7 +229,7 @@
                                         </td>
                                     </tr>
 
-                                    <!-- Modal Hapus Murojaah -->
+                                    <!-- Modal Hapus Munaqasyah -->
                                     <div class="modal fade" id="modalHapusMurojaah{{ $item->id }}" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered" style="max-width: auto;">
                                             <form action="/hapus-munaqasyah-tahfidz/{{ $item->id }}" method="POST">

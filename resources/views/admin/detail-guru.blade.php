@@ -75,13 +75,13 @@
                                 <span class="h6">Riwayat Mengajar:</span>
                                 <span>{{ $detailGuru['riwayat_mengajar'] ?? '-' }}</span>
                             </li>
-                            <h3>Grup Cabang</h3>
+                            <!-- <h3>Grup Cabang</h3>
                             @if (!empty($detailGuru['grup_cabang']))
                                 <p><strong>Nama Grup:</strong> {{ $detailGuru['grup_cabang']->nama_grup }}</p>
                                 <p><strong>Alamat Grup:</strong> {{ $detailGuru['grup_cabang']->alamat_grup }}</p>
                             @else
                                 <p>Data grup cabang tidak tersedia.</p>
-                            @endif
+                            @endif -->
                         </ul>
                     </div>
                 </div>
@@ -163,19 +163,6 @@
                                     value="{{ $detailGuru['riwayat_mengajar'] ?? '-' }}" placeholder="Riwayat Mengajar"
                                     name="riwayat_mengajar" aria-label="Riwayat Mengajar" required />
                             </div>
-                            <div class="mb-3">
-                              <label for="grup_cabang" class="form-label">Grup Cabang</label>
-                              <select class="form-select" name="grup_cabang" required>
-                                  <option value="">Pilih Grup Cabang</option>
-                                  @foreach ($grupCabang as $cabang)
-                                      <option value="{{ $cabang->id }}"
-                                          {{ (isset($detailGuru['grup_cabang']) && $detailGuru['grup_cabang']->id == $cabang->id) ? 'selected' : '' }}>
-                                          {{ $cabang->nama_grup }}
-                                      </option>
-                                  @endforeach
-                              </select>
-                          </div>
-
                         </div>
                     </div>
                     <div class="modal-footer">

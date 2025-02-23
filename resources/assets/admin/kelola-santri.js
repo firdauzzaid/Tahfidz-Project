@@ -200,120 +200,174 @@ $(function () {
   // Edit record
   $(document).on('click', '.edit-record', function () {
     var user_id = $(this).data('id'),
-      dtrModal = $('.dtr-bs-modal.show');
+        dtrModal = $('.dtr-bs-modal.show');
 
-    // hide responsive modal in small screen
+    // Hide responsive modal in small screen
     if (dtrModal.length) {
-      dtrModal.modal('hide');
+        dtrModal.modal('hide');
     }
 
-    // get data
-    $.get(''.concat(baseUrl, 'santri-list/').concat(user_id, '/edit'), function (data) {
-      $('#id').val(data.id);
-      $('#no_identitas').val(data.no_identitas);
-      $('#nama_lengkap').val(data.nama_lengkap);
-      $('#alamat').val(data.alamat);
-      $('#tgl_lahir').val(data.tgl_lahir);
-      $('#jenis_kelamin').val(data.jenis_kelamin);
-      $('#keterangan').val(data.keterangan);
-      $('#status').val(data.status);
-      $('#nama_wali_ayah').val(data.nama_wali_ayah);
-      $('#telepon_wali_ayah').val(data.telepon_wali_ayah);
-      $('#alamat_wali_ayah').val(data.alamat_wali_ayah);
-      $('#nama_wali_ibu').val(data.nama_wali_ibu);
-      $('#telepon_wali_ibu').val(data.telepon_wali_ibu);
-      $('#alamat_wali_ibu').val(data.alamat_wali_ibu);
+    // Get data from server
+    $.ajax({
+        url: `${baseUrl}santri-list/${user_id}/edit`,
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            // Santri Data
+            $('#id').val(data.id);
+            $('#no_identitas').val(data.no_identitas);
+            $('#nama_lengkap').val(data.nama_lengkap);
+            $('#alamat').val(data.alamat);
+            $('#tgl_lahir').val(data.tgl_lahir);
+            $('#jenis_kelamin').val(data.jenis_kelamin);
+            $('#keterangan').val(data.keterangan);
+            $('#status').val(data.status);
+
+            // Wali Santri data
+            $('#nama_wali_ayah').val(data.nama_wali_ayah);
+            $('#telepon_wali_ayah').val(data.telepon_wali_ayah);
+            $('#alamat_wali_ayah').val(data.alamat_wali_ayah);
+            $('#nama_wali_ibu').val(data.nama_wali_ibu);
+            $('#telepon_wali_ibu').val(data.telepon_wali_ibu);
+            $('#alamat_wali_ibu').val(data.alamat_wali_ibu);
+
+            // Buka modal
+            $('#modalEditData').modal('show');
+
+            // Pastikan tab pertama aktif saat modal dibuka
+            $('#editSantriTabs a:first').tab('show');
+        },
+        error: function () {
+            alert("Data tidak ditemukan atau terjadi kesalahan.");
+        }
     });
-    
-    // validating form and updating user's data
+
+    // Form validation setup
     var editData = document.getElementById('editData');
-
-    // user form validation
-    var fv = FormValidation.formValidation(editData, {
-      fields: {
-        no_identitas: {
-          validators: {
-            notEmpty: {
-              message: '*Wajib Diisi'
+    if (editData) {
+      var fv = FormValidation.formValidation(editData, {
+        fields: {
+            no_identitas: {
+                validators: {
+                    notEmpty: {
+                        message: '*Wajib Diisi'
+                    }
+                }
+            },
+            nama_lengkap: {
+                validators: {
+                    notEmpty: {
+                        message: '*Wajib Diisi'
+                    }
+                }
+            },
+            alamat: {
+                validators: {
+                    notEmpty: {
+                        message: '*Wajib Diisi'
+                    }
+                }
+            },
+            status: {
+                validators: {
+                    notEmpty: {
+                        message: '*Wajib Diisi'
+                    }
+                }
+            },
+            nama_wali_ayah: {
+              validators: {
+                  notEmpty: {
+                      message: '*Wajib Diisi'
+                  }
+              }
+            },
+            telepon_wali_ayah: {
+                validators: {
+                    notEmpty: {
+                        message: '*Wajib Diisi'
+                    }
+                }
+            },
+            alamat_wali_ayah: {
+              validators: {
+                  notEmpty: {
+                      message: '*Wajib Diisi'
+                  }
+              }
+            },
+            nama_wali_ibu: {
+                validators: {
+                    notEmpty: {
+                        message: '*Wajib Diisi'
+                    }
+                }
+            },
+            telepon_wali_ibu: {
+              validators: {
+                  notEmpty: {
+                      message: '*Wajib Diisi'
+                  }
+              }
+            },
+            alamat_wali_ibu: {
+                validators: {
+                    notEmpty: {
+                        message: '*Wajib Diisi'
+                    }
+                }
             }
-          }
         },
-        nama_lengkap: {
-          validators: {
-            notEmpty: {
-              message: '*Wajib Diisi'
-            }
-          }
-        },
-        alamat: {
-          validators: {
-            notEmpty: {
-              message: '*Wajib Diisi'
-            }
-          }
-        },
-        status: {
-          validators: {
-            notEmpty: {
-              message: '*Wajib Diisi'
-            }
-          }
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap5: new FormValidation.plugins.Bootstrap5({
+                eleValidClass: '',
+                rowSelector: function (field, ele) {
+                    return `.field-${field}`;
+                }
+            }),
+            submitButton: new FormValidation.plugins.SubmitButton(),
+            autoFocus: new FormValidation.plugins.AutoFocus()
         }
-      },
-      plugins: {
-        trigger: new FormValidation.plugins.Trigger(),
-        bootstrap5: new FormValidation.plugins.Bootstrap5({
-          // Use this for enabling/changing valid/invalid class
-          eleValidClass: '',
-          rowSelector: function rowSelector(field, ele) {
-            // field is the field name & ele is the field element
-            return '.fieldnya';
-          }
-        }),
-        submitButton: new FormValidation.plugins.SubmitButton(),
-        // Submit the form when all fields are valid
-        // defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
-        autoFocus: new FormValidation.plugins.AutoFocus()
-      }
-    }).on('core.form.valid', function () {
-      // adding or updating user when form successfully validate
-      $.ajax({
-        data: $('#editData').serialize(),
-        url: ''.concat(baseUrl, 'santri-list'),
-        type: 'POST',
-        success: function success(response) {
-          // sweetalert
-          Swal.fire({
-            icon: 'success',
-            title: 'Sip, Berhasil',
-            text: 'Data pengguna berhasil '.concat(response.status === 'created' ? 'dibuat' : 'diupdate'),
-            customClass: {
-              confirmButton: 'btn btn-success'
-            }
-          }).then(result => {
-            if (result.isConfirmed) {
-              window.location.reload();
-            }
-          });
-        },
-        error: function error(err) {
-          const errorResponse = err.responseJSON || {};
-
-          Swal.fire({
-            title: 'Yah, Gagal',
-            text: errorResponse.message || 'Terjadi kesalahan.',
-            icon: 'error',
-            customClass: {
-              confirmButton: 'btn btn-success'
-            }
-          }).then(result => {
-            if (result.isConfirmed) {
-              window.location.reload();
-            }
-          });
-        }
-      });
     });
+    fv.on('core.form.valid', function () {
+        // Submit form data via AJAX
+        $.ajax({
+            url: `${baseUrl}santri-list`,
+            type: 'POST',
+            data: $('#editData').serialize(),
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sip, Berhasil',
+                    text: `Data pengguna berhasil ${response.status === 'created' ? 'dibuat' : 'diupdate'}`,
+                    customClass: {
+                        confirmButton: 'btn btn-success'
+                    }
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        window.location.reload();
+                    }
+                });
+            },
+            error: function (err) {
+                const errorResponse = err.responseJSON || {};
+                Swal.fire({
+                    title: 'Yah, Gagal',
+                    text: errorResponse.message || 'Terjadi kesalahan.',
+                    icon: 'error',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    }
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+      });
+    }
   });
 
   // Delete Record
@@ -389,12 +443,13 @@ document.addEventListener('DOMContentLoaded', function () {
     event.preventDefault(); // Mencegah form submit default
 
     const formData = new FormData(userForm);
+    const csrfToken = document.querySelector('input[name="_token"]').value;
 
     fetch(userForm.action, {
       method: 'POST',
       body: formData,
       headers: {
-        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+        'X-CSRF-TOKEN':csrfToken
       }
     })
       .then(response => {
@@ -427,7 +482,6 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }).then(() => {
           location.reload();
-          console.log(data);
         });
       })
       .catch(error => {

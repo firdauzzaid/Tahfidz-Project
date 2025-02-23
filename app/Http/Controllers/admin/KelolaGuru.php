@@ -16,29 +16,9 @@ class KelolaGuru extends Controller
     */
     public function KelolaGuru()
     {
-        // Ambil data dari tabel grup_cabang
-        $grupCabang = DB::table('grup_cabang')
-            ->select('id', 'nama_grup', 'alamat_grup')
-            ->get();
-
         // Kirim data ke view
-        return view('admin.kelola-guru', ['grupCabang' => $grupCabang]);
-        // return view('admin.kelola-guru');
+        return view('admin.kelola-guru');
     }
-        
-    // Ambil grup_santri berdasarkan id_cabang yang dipilih
-    // public function getDataRombel($id_cabang)
-    // {
-    //     // Ambil grup_santri berdasarkan id_cabang yang dipilih
-    //     $grupSantriCabang = DB::table('grup_santri')
-    //         ->where('id_cabang', $id_cabang)
-    //         ->get();
-
-    //     return response()->json([
-    //         'success' => count($grupSantriCabang) > 0,
-    //         'rombel_data' => $grupSantriCabang
-    //     ]);
-    // }
 
   /**
    * Display a listing of the resource.
@@ -291,44 +271,43 @@ class KelolaGuru extends Controller
               'status' => $guru->status,
               'created_at' => $guru->created_at,
               'updated_at' => $guru->updated_at,
-              'id_grup_cabang' => $dataGuru->id_grup_cabang ?? null,
-              'id_grup_santri' => $dataGuru->id_grup_santri ?? null,
+            //   'id_grup_cabang' => $dataGuru->id_grup_cabang ?? null,
+            //   'id_grup_santri' => $dataGuru->id_grup_santri ?? null,
               'lulusan' => $dataGuru->lulusan ?? null,
               'foto' => $dataGuru->foto ?? null,
               'riwayat_mengajar' => $dataGuru->riwayat_mengajar ?? null,
           ];
 
           // Ambil data grup_cabang berdasarkan id_grup_cabang
-          if (!empty($dataGuru->id_grup_cabang)) {
-              $grupCabang = DB::table('grup_cabang')
-                  ->select('id', 'nama_grup', 'alamat_grup')
-                  ->where('id', $dataGuru->id_grup_cabang)
-                  ->first();
+        //   if (!empty($dataGuru->id_grup_cabang)) {
+        //       $grupCabang = DB::table('grup_cabang')
+        //           ->select('id', 'nama_grup', 'alamat_grup')
+        //           ->where('id', $dataGuru->id_grup_cabang)
+        //           ->first();
 
-              $detailGuru['grup_cabang'] = $grupCabang;
-          }
-          // Ambil semua data dari tabel grup_cabang
-              $grupCabang = DB::table('grup_cabang')
-                  ->select('id', 'nama_grup', 'alamat_grup')
-                  ->get();
-          
+        //       $detailGuru['grup_cabang'] = $grupCabang;
+        //   }
+        //   // Ambil semua data dari tabel grup_cabang
+                // $grupCabang = DB::table('grup_cabang')
+                //     ->select('id', 'nama_grup', 'alamat_grup')
+                //     ->get();
 
-          // Ambil data grup_santri berdasarkan id_grup_cabang
-          if (!empty($dataGuru->id_grup_santri)) {
-              $grupSantri = DB::table('grup_santri')
-                  ->select('id', 'id_cabang', 'nama_grup', 'jumlah_maksimal')
-                  ->where('id_cabang', $dataGuru->id_grup_cabang)
-                  ->first();
+        //   // Ambil data grup_santri berdasarkan id_grup_cabang
+        //   if (!empty($dataGuru->id_grup_santri)) {
+        //       $grupSantri = DB::table('grup_santri')
+        //           ->select('id', 'id_cabang', 'nama_grup', 'jumlah_maksimal')
+        //           ->where('id_cabang', $dataGuru->id_grup_cabang)
+        //           ->first();
 
-              $detailGuru['grup_santri'] = $grupSantri;
-          }
+        //       $detailGuru['grup_santri'] = $grupSantri;
+        //   }
           // Ambil semua data dari tabel grup_santri
-               $grupSantri = DB::table('grup_santri')
-                  ->select('id', 'id_cabang', 'nama_grup', 'jumlah_maksimal')
-                  ->get();
+                // $grupSantri = DB::table('grup_santri')
+                //     ->select('id', 'id_cabang', 'nama_grup', 'jumlah_maksimal')
+                //     ->get();
 
           // Tampilkan data ke view
-          return view('admin.detail-guru', compact('detailGuru','grupCabang', 'grupSantri'));
+          return view('admin.detail-guru', compact('detailGuru'));
       } else {
           // Jika data user tidak ditemukan, redirect dengan pesan error
           return redirect()->route('admin.kelola-guru')->with('error', 'Guru tidak ditemukan.');
@@ -347,8 +326,8 @@ class KelolaGuru extends Controller
       'lulusan' => 'required|string|max:255',
       'riwayat_mengajar' => 'required|string|max:255',
       'foto' => 'nullable|file|mimes:jpg,png,webp,heic,jpeg|max:5120', // Maks 5MB
-      'grup_cabang' => 'required|exists:grup_cabang,id',
-      'grup_santri' => 'required|exists:grup_santri,id'
+    //   'grup_cabang' => 'required|exists:grup_cabang,id',
+    //   'grup_santri' => 'required|exists:grup_santri,id'
     ]);
 
     // Data dari request
@@ -359,8 +338,8 @@ class KelolaGuru extends Controller
     $status = $request->input('status');
     $lulusan = $request->input('lulusan');
     $riwayatMengajar = $request->input('riwayat_mengajar');
-    $idGrupCabang = $request->input('grup_cabang');
-    $idGrupSantri = $request->input('grup_santri');
+    // $idGrupCabang = $request->input('grup_cabang');
+    // $idGrupSantri = $request->input('grup_santri');
 
     // Proses file foto jika ada
     $fotoNama = null;
@@ -386,8 +365,8 @@ class KelolaGuru extends Controller
       $dataGuruUpdate = [
         'lulusan' => $lulusan,
         'riwayat_mengajar' => $riwayatMengajar,
-        'id_grup_cabang' => $idGrupCabang,
-        'id_grup_santri' => $idGrupSantri
+        // 'id_grup_cabang' => $idGrupCabang,
+        // 'id_grup_santri' => $idGrupSantri
       ];
 
       if ($fotoNama) {

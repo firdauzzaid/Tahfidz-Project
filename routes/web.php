@@ -41,7 +41,6 @@ Route::middleware(['auth-admin'])->group(function () {
 
   //--Kelola Guru
   Route::get('/kelola-guru', [KelolaGuru::class, 'KelolaGuru'])->name('admin.kelola-guru');
-  // Route::get('/update-rombel-data/{id_cabang}', [KelolaGuru::class, 'getDataRombel'])->name('updateRombelData');
   Route::get('/admin/select-guru', [KelolaGuru::class, 'selectPengguna']);
   Route::get('/admin/detail-guru/{id}', [KelolaGuru::class, 'detailGuru'])->name('admin.detail-guru');
   Route::post('/admin/edit-data-guru', [KelolaGuru::class, 'editDataGuru'])->name('admin.edit-data-guru');
@@ -56,27 +55,27 @@ Route::middleware(['auth-admin'])->group(function () {
   Route::post('/admin/edit-data-santri/{id}', [KelolaSantri::class, 'editDataSantri'])->name('admin.edit-data-santri');
   Route::resource('/santri-list', KelolaSantri::class);
 
-  //-Kelola Jadwal
+  //--Kelola Jadwal
   Route::get('/kelola-jadwal', [KelolaJadwal::class, 'index'])->name('admin.kelola-jadwal');
-  //-Kelola Grup Cabang
+  //--Kelola Grup Cabang
   Route::get('/kelola-grup-cabang', [KelolaGrupCabang::class, 'index'])->name('admin.kelola-grup-cabang');
   Route::post('/admin/tambah-grup-cabang', [KelolaGrupCabang::class, 'tambahGrupCabang'])->name('admin.tambah-grup-cabang');
   Route::post('/admin/edit-grup-cabang/{id}', [KelolaGrupCabang::class, 'editGrupCabang'])->name('admin.edit-grup-cabang');
   Route::post('/admin/delete-grup-cabang/{id}', [KelolaGrupCabang::class, 'deleteGrupCabang'])->name('admin.hapus-grup-cabang');
 
-  //-Kelola Grup Santri
+  //--Kelola Grup Santri
   Route::get('/kelola-grup-santri', [KelolaGrupSantri::class, 'index'])->name('admin.kelola-grup-santri');
   Route::post('/admin/tambah-grup-santri', [KelolaGrupSantri::class, 'tambahGrupSantri'])->name('admin.tambah-grup-santri');
   Route::post('/admin/edit-grup-santri/{id}', [KelolaGrupSantri::class, 'editGrupSantri'])->name('admin.edit-grup-santri');
   Route::post('/admin/delete-grup-santri/{id}', [KelolaGrupSantri::class, 'deleteGrupSantri'])->name('admin.hapus-grup-santri');
 
-  //-Kelola Grup Kelompok
+  //--Kelola Grup Kelompok
   Route::get('/kelola-grup-kelompok', [KelolaGrupKelompok::class, 'index'])->name('admin.kelola-grup-kelompok');
   Route::post('/admin/tambah-grup-kelompok', [KelolaGrupKelompok::class, 'tambahGrupKelompok'])->name('admin.tambah-grup-kelompok');
   Route::post('/admin/edit-grup-kelompok/{id}', [KelolaGrupKelompok::class, 'editGrupKelompok'])->name('admin.edit-grup-kelompok');
   Route::post('/admin/delete-grup-kelompok/{id}', [KelolaGrupKelompok::class, 'deleteGrupKelompok'])->name('admin.hapus-grup-kelompok');
 
-  //-Kelola Juz
+  //--Kelola Juz
   Route::get('/kelola-juz', [KelolaJuz::class, 'index'])->name('admin.kelola-juz');
   Route::post('/admin/tambah-juz', [KelolaJuz::class, 'tambahJuz'])->name('admin.tambah-juz');
   Route::post('/admin/edit-juz/{id}', [KelolaJuz::class, 'editJuz'])->name('admin.edit-juz');
@@ -89,10 +88,10 @@ Route::middleware(['auth-admin'])->group(function () {
   Route::post('/admin/hapus-surat/{id_juz_level}', [KelolaJuz::class, 'hapusSurat'])->name('admin.hapus-surat');
   Route::get('/admin/get-levels/{id_juz}', [KelolaJuz::class, 'getLevels'])->name('admin.getLevels');
 
-  //-Laporan
+  //--Laporan
   Route::get('/laporan', [Laporan::class, 'index'])->name('admin.laporan');
 
-  //-Pengaturan Website
+  //--Pengaturan Website
   Route::get('/pengaturan-website', [SettingWeb::class, 'index'])->name('admin.pengaturan-website');
   Route::post('/update-website', [SettingWeb::class, 'updateWebsite'])->name('admin.update-website');
 

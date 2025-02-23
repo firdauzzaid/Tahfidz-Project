@@ -101,22 +101,6 @@
                                     </select>
                                 </div>
                                 
-                                <!-- <div class="mb-3" id="grupCabangContainer">
-                                    <label for="grup_cabang" class="form-label">Kelas</label>
-                                    <select class="form-select" id="grupCabangSelect" name="grup_cabang" required>
-                                        <option value="">Pilih Kelas</option>
-                                        @foreach ($grupCabang as $cabang)
-                                            <option value="{{ $cabang->id }}">{{ $cabang->nama_grup }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="mb-3" id="grupSantriContainer">
-                                    <label for="grup_santri" class="form-label">Rombel</label>
-                                    <select class="form-select" id="grupSantriSelect" name="grup_santri" required>
-                                        <option value="">Pilih Rombel</option>
-                                    </select>
-                                </div> -->
-                                
                             </div>
                         </div>
                         <div class="modal-footer">

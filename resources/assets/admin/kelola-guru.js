@@ -63,12 +63,28 @@ $(function () {
           targets: 2,
           render: function (data, type, full, meta) {
             var $id = full['id'];
+            var $level = full['level'];
 
-            return (
-              '<a href="/admin/detail-guru/' +
-              $id +
-              '" class="user-id btn btn-sm btn-label-primary" style="width:130px;">Detail Guru</a>'
-            );
+            // Tentukan URL dan teks tombol berdasarkan level
+            if ($level == 0) {
+              return (
+                '<a href="/admin/detail-guru/' +
+                $id +
+                '" class="user-id btn btn-sm btn-label-primary" style="width:130px;">Detail Admin</a>'
+              );
+            } else if ($level == 1) {
+              return (
+                '<a href="/admin/detail-guru/' +
+                $id +
+                '" class="user-id btn btn-sm btn-label-primary" style="width:130px;">Detail Guru</a>'
+              );
+            } 
+
+            // return (
+            //   '<a href="/admin/detail-guru/' +
+            //   $id +
+            //   '" class="user-id btn btn-sm btn-label-primary" style="width:130px;">Detail Guru</a>'
+            // );
           }
         },
         {

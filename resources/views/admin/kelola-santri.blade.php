@@ -64,7 +64,7 @@
                         @csrf
                         <div class="modal-body">
                             <!-- Tab Navigation -->
-                            <ul class="nav nav-tabs" id="editSantriTabs" role="tablist">
+                            <ul class="nav nav-tabs" id="addSantriTabs" role="tablist">
                                 <li class="nav-item">
                                     <a class="nav-link active" id="santri-tab" data-bs-toggle="tab" href="#dataSantri" role="tab">Data Santri</a>
                                 </li>
@@ -192,7 +192,7 @@
             </div>
         </div>
 
-        <!-- Modal Edit Data-->
+        <!-- Modal Edit Data -->
         <div class="modal fade" id="modalEditData" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -200,130 +200,122 @@
                         <h5 class="modal-title" id="modalEditTitle">Edit Santri</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form class="edit-data-user" id="editData">
+                    <form class="edit-data-santri" id="editData">
                         @csrf
+                        <input type="hidden" id="id" name="id">
                         <div class="modal-body">
-                            <input type="hidden" id="id" name="id" />
-                                <!-- Tab Navigation -->
-                                <ul class="nav nav-tabs" id="editSantriTabs" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link active" id="santri-tab" data-bs-toggle="tab" data-bs-target="#editDataSantri" role="tab" aria-controls="editDataSantri" aria-selected="true">Data Santri</a>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link" id="data-wali-tab" data-bs-toggle="tab" data-bs-target="#editDataWali" role="tab" aria-controls="editDataWali" aria-selected="false">Data Wali Santri</a>
-                                    </li>
-                                </ul>
+                            <!-- Tab Navigation -->
+                            <ul class="nav nav-tabs" id="editSantriTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="data-santri-tab" data-bs-toggle="tab" href="#data-santri" role="tab" aria-controls="data-santri" aria-selected="true">Data Santri</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="data-wali-tab" data-bs-toggle="tab" href="#data-wali" role="tab" aria-controls="data-wali" aria-selected="false">Data Wali Santri</a>
+                                </li>
+                            </ul>
 
-                                <div class="tab-content p-3">
-                                    <!-- Tab Data Santri -->
-                                    <div class="tab-pane fade show active" id="editDataSantri" role="tabpanel"
-                                        aria-labelledby="santri-tab">
-                                        <div class="row">
-                                            <div class="mb-3">
-                                                <label for="no_identitas">No Identitas</label>
-                                                <input type="text" class="form-control" id="no_identitas" name="no_identitas" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="nama_lengkap">Nama</label>
-                                                <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="alamat">Alamat</label>
-                                                <input type="text" class="form-control" id="alamat" name="alamat" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="tgl_lahir">Tanggal Lahir</label>
-                                                <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="jenis_kelamin">Jenis Kelamin</label>
-                                                <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
-                                                    <option value="">Pilih Salah Satu</option>
-                                                    <option value="Laki-Laki">Laki-Laki</option>
-                                                    <option value="Perempuan">Perempuan</option>
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="keterangan">Keterangan</label>
-                                                <input type="text" class="form-control" id="keterangan" name="keterangan" />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="grup_cabang">Kelas</label>
-                                                <select class="form-select" id="grup_cabang" name="grup_cabang" required>
-                                                    @foreach ($grupCabang as $cabang)
-                                                    <option value="{{ $cabang->id }}">{{ $cabang->nama_grup }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="grup_santri">Rombel</label>
-                                                <select class="form-select" id="grup_santri" name="grup_santri" required>
-                                                    @foreach ($grupSantri as $santri)
-                                                    <option value="{{ $santri->id }}">{{ $santri->nama_grup }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="kelompok_quran">Kelompok Qur'an</label>
-                                                <select class="form-select" id="kelompok_quran" name="kelompok_quran" required>
-                                                    @foreach ($grupKelompok as $kelompok)
-                                                    <option value="{{ $kelompok->id }}">{{ $kelompok->nama_kelompok }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="status">Status</label>
-                                                <select class="form-select" id="status" name="status" required>
-                                                    <option value="0">Aktif</option>
-                                                    <option value="1">Lulus</option>
-                                                </select>
-                                            </div>
+                            <div class="tab-content p-3">
+                                <!-- Tab Data Santri -->
+                                <div class="tab-pane fade show active" id="data-santri" role="tabpanel" aria-labelledby="data-santri-tab">
+                                    <div class="row">
+                                        <div class="mb-3">
+                                            <label for="no_identitas">No Identitas</label>
+                                            <input type="text" class="form-control" id="no_identitas" name="no_identitas" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="nama_lengkap">Nama</label>
+                                            <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="alamat">Alamat</label>
+                                            <input type="text" class="form-control" id="alamat" name="alamat" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="tgl_lahir">Tanggal Lahir</label>
+                                            <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="jenis_kelamin">Jenis Kelamin</label>
+                                            <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
+                                                <option value="">Pilih Salah Satu</option>
+                                                <option value="Laki-Laki">Laki-Laki</option>
+                                                <option value="Perempuan">Perempuan</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="keterangan">Keterangan</label>
+                                            <input type="text" class="form-control" id="keterangan" name="keterangan" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="grup_cabang">Kelas</label>
+                                            <select class="form-select" id="grup_cabang" name="grup_cabang" required>
+                                                @foreach ($grupCabang as $cabang)
+                                                <option value="{{ $cabang->id }}">{{ $cabang->nama_grup }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="grup_santri">Rombel</label>
+                                            <select class="form-select" id="grup_santri" name="grup_santri" required>
+                                                @foreach ($grupSantri as $santri)
+                                                <option value="{{ $santri->id }}">{{ $santri->nama_grup }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="kelompok_quran">Kelompok Qur'an</label>
+                                            <select class="form-select" id="kelompok_quran" name="kelompok_quran" required>
+                                                @foreach ($grupKelompok as $kelompok)
+                                                <option value="{{ $kelompok->id }}">{{ $kelompok->nama_kelompok }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="status">Status</label>
+                                            <select class="form-select" id="status" name="status" required>
+                                                <option value="0">Aktif</option>
+                                                <option value="1">Lulus</option>
+                                            </select>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- Tab Data Wali Santri -->
-                                    <div class="tab-pane fade" id="editdataWali" role="tabpanel" 
-                                    aria-labelledby="data-wali-tab">
-                                        <div class="row">
-                                            <h5 class="fw-bold text-center">Wali Santri - Ayah</h5>
-                                            <div class="mb-3">
-                                                <label for="nama_wali_ayah">Nama Wali Ayah</label>
-                                                <input type="text" class="form-control" id="nama_wali_ayah" name="nama_wali_ayah"
-                                                    required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="telepon_wali_ayah">Telepon Ayah</label>
-                                                <input type="number" class="form-control" id="telepon_wali_ayah" name="telepon_wali_ayah"
-                                                    required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="alamat_wali_ayah">Alamat Ayah</label>
-                                                <input type="text" class="form-control" id="alamat_wali_ayah" name="alamat_wali_ayah"
-                                                    required />
-                                            </div>
+                                <!-- Tab Data Wali Santri -->
+                                <div class="tab-pane fade" id="data-wali" role="tabpanel" aria-labelledby="data-wali-tab">
+                                    <div class="row">
+                                        <h5 class="fw-bold text-center">Wali Santri - Ayah</h5>
+                                        <div class="mb-3">
+                                            <label for="nama_wali_ayah">Nama Wali Ayah</label>
+                                            <input type="text" class="form-control" id="nama_wali_ayah" name="nama_wali_ayah" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="telepon_wali_ayah">Telepon Ayah</label>
+                                            <input type="number" class="form-control" id="telepon_wali_ayah" name="telepon_wali_ayah" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="alamat_wali_ayah">Alamat Ayah</label>
+                                            <input type="text" class="form-control" id="alamat_wali_ayah" name="alamat_wali_ayah" required />
+                                        </div>
 
-                                            <h5 class="fw-bold text-center">Wali Santri - Ibu</h5>
-                                            <div class="mb-3">
-                                                <label for="nama_wali_ibu">Nama Wali Ibu</label>
-                                                <input type="text" class="form-control" id="nama_wali_ibu" name="nama_wali_ibu"
-                                                    required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="telepon_wali_ibu">Telepon Ibu</label>
-                                                <input type="number" class="form-control" id="telepon_wali_ibu" name="telepon_wali_ibu"
-                                                    required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="alamat_wali_ibu">Alamat Ibu</label>
-                                                <input type="text" class="form-control" id="alamat_wali_ibu" name="alamat_wali_ibu"
-                                                    required />
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-primary">Update</button>
-                                            </div>
+                                        <h5 class="fw-bold text-center">Wali Santri - Ibu</h5>
+                                        <div class="mb-3">
+                                            <label for="nama_wali_ibu">Nama Wali Ibu</label>
+                                            <input type="text" class="form-control" id="nama_wali_ibu" name="nama_wali_ibu" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="telepon_wali_ibu">Telepon Ibu</label>
+                                            <input type="number" class="form-control" id="telepon_wali_ibu" name="telepon_wali_ibu" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="alamat_wali_ibu">Alamat Ibu</label>
+                                            <input type="text" class="form-control" id="alamat_wali_ibu" name="alamat_wali_ibu" required />
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-primary">Update</button>
                                         </div>
                                     </div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -386,7 +378,7 @@
 
             const updateKelompokQuranDropdown = (id_rombel) => {
                 if (!id_rombel) {
-                    grupKelompokQuranSelect.innerHTML = '<option value="">Pilih Kelompok Quran</option>';
+                    grupKelompokQuranSelect.innerHTML = '<option value="">Pilih Kelompok Qur\'an</option>';
                     return;
                 }
 
@@ -404,7 +396,7 @@
                         return response.json();
                     })
                     .then(data => {
-                        grupKelompokQuranSelect.innerHTML = '<option value="">Pilih Kelompok Quran</option>';
+                        grupKelompokQuranSelect.innerHTML = '<option value="">Pilih Kelompok Qur\'an</option>';
 
                         if (data.success && Array.isArray(data.kelompok_quran_data) && data.kelompok_quran_data.length > 0) {
                             data.kelompok_quran_data.forEach(kelompok_quran => {
@@ -420,57 +412,6 @@
             grupSantriSelect.addEventListener("change", function () {
                 updateKelompokQuranDropdown(this.value);
             });
-        });
-
-        $(document).ready(function () {
-            $(".edit-record").click(function () {
-                let id = $(this).data("id");
-
-                $.ajax({
-                    url: `${baseUrl}santri-list/${id}/edit`,
-                    type: "GET",
-                    dataType: "json",
-                    success: function (data) {
-                        // Isi data ke dalam modal edit
-                        $("#id").val(data.id);
-                        $("#no_identitas").val(data.no_identitas);
-                        $("#nama_lengkap").val(data.nama_lengkap);
-                        $("#alamat").val(data.alamat);
-                        $("#tgl_lahir").val(data.tgl_lahir);
-                        $("#jenis_kelamin").val(data.jenis_kelamin);
-                        $("#keterangan").val(data.keterangan);
-                        $("#grup_cabang").val(data.id_grup_cabang);
-                        $("#grup_santri").val(data.id_grup_santri);
-                        $("#kelompok_quran").val(data.id_kelompok_quran);
-                        $("#status").val(data.status);
-
-                        // Data Wali Santri
-                        $("#nama_wali_ayah").val(data.nama_wali_ayah);
-                        $("#telepon_wali_ayah").val(data.telepon_wali_ayah);
-                        $("#alamat_wali_ayah").val(data.alamat_wali_ayah);
-                        $("#nama_wali_ibu").val(data.nama_wali_ibu);
-                        $("#telepon_wali_ibu").val(data.telepon_wali_ibu);
-                        $("#alamat_wali_ibu").val(data.alamat_wali_ibu);
-
-                        // Pastikan tab pertama tetap aktif ketika modal dibuka
-                        $("#editSantriTabs a:first").tab("show");
-                    },
-                    error: function () {
-                        alert("Data tidak ditemukan atau terjadi kesalahan.");
-                    },
-                });
-            });
-
-            // Inisialisasi tab Bootstrap secara manual jika perlu
-            var triggerTabList = [].slice.call(document.querySelectorAll('#editSantriTabs a:first'))
-            triggerTabList.forEach(function (triggerEl) {
-                var tabTrigger = new bootstrap.Tab(triggerEl)
-
-                triggerEl.addEventListener('click', function (event) {
-                    event.preventDefault()
-                    tabTrigger.show()
-                })
-            })
         });
     </script>
 @endsection

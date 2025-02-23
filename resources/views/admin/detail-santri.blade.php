@@ -168,8 +168,7 @@
                         </ul>
                         <div class="tab-content p-3">
                             <!-- Tab Data Santri -->
-                            <div class="tab-pane fade show active" id="data-santri" role="tabpanel"
-                                aria-labelledby="data-santri-tab">
+                            <div class="tab-pane fade show active" id="data-santri" role="tabpanel" aria-labelledby="data-santri-tab">
                                 <div class="row">
                                     <div class="mb-3">
                                         <label for="nama_lengkap" class="form-label">Nama</label>
@@ -260,9 +259,15 @@
                                 <div class="row">
                                     <h5 class="fw-bold text-center">Wali Santri - Ayah</h5>
                                     <div class="mb-3">
+                                        <label for="no_identitas_ayah" class="form-label">No Identitas</label>
+                                        <input type="text" class="form-control" placeholder="No Identitas Wali Ayah"
+                                            name="no_identitas_ayah" value="{{ $waliAyah->no_identitas }}"
+                                            aria-label="No Identitas Wali Ayah" required />
+                                    </div>
+                                    <div class="mb-3">
                                         <label for="nama_wali_ayah" class="form-label">Username</label>
                                         <input type="text" class="form-control" placeholder="Username Wali"
-                                            name="nama_wali_ayah" value="{{ $waliAyah->nama_wali_ayah }}"
+                                            name="nama_wali_ayah" value="{{ $waliAyah->nama_wali }}"
                                             aria-label="Nama Wali Ayah" required />
                                     </div>
                                     <div class="mb-3">
@@ -279,9 +284,15 @@
                                     </div>
                                     <h5 class="fw-bold text-center">Wali Santri - Ibu</h5>
                                     <div class="mb-3">
+                                        <label for="no_identitas_ibu" class="form-label">No Identitas</label>
+                                        <input type="text" class="form-control" placeholder="No Identitas Wali Ibu"
+                                            name="no_identitas_ibu" value="{{ $waliIbu->no_identitas }}"
+                                            aria-label="No Identitas Wali Ibu" required />
+                                    </div>
+                                    <div class="mb-3">
                                         <label for="nama_wali_ibu" class="form-label">Username</label>
                                         <input type="text" class="form-control" placeholder="Username Wali"
-                                            name="nama_wali_ibu" value="{{ $waliIbu->nama_wali_ibu }}"
+                                            name="nama_wali_ibu" value="{{ $waliIbu->nama_wali }}"
                                             aria-label="Nama Wali Ibu" required />
                                     </div>
                                     <div class="mb-3">
@@ -297,8 +308,7 @@
                                             aria-label="Alamat Wali" required />
                                     </div>
                                     <div class="d-flex flex-row justify-content-end">
-                                        <button type="button" class="btn btn-label-secondary me-2"
-                                            data-bs-dismiss="modal">Batal</button>
+                                        <button type="button" class="btn btn-label-secondary me-2" data-bs-dismiss="modal">Batal</button>
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </div>
