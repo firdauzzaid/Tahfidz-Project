@@ -207,39 +207,29 @@ $(function () {
         dtrModal.modal('hide');
     }
 
-    // Get data from server
-    $.ajax({
-        url: `${baseUrl}santri-list/${user_id}/edit`,
-        type: "GET",
-        dataType: "json",
-        success: function (data) {
-            // Santri Data
-            $('#id').val(data.id);
-            $('#no_identitas').val(data.no_identitas);
-            $('#nama_lengkap').val(data.nama_lengkap);
-            $('#alamat').val(data.alamat);
-            $('#tgl_lahir').val(data.tgl_lahir);
-            $('#jenis_kelamin').val(data.jenis_kelamin);
-            $('#keterangan').val(data.keterangan);
-            $('#status').val(data.status);
+    // get data
+    $.get(''.concat(baseUrl, 'santri-list/').concat(user_id, '/edit'), function (data) {
+      $('#id').val(data.id);
+      $('#no_identitas').val(data.no_identitas);
+      $('#nama_lengkap').val(data.nama_lengkap);
+      $('#alamat').val(data.alamat);
+      $('#tgl_lahir').val(data.tgl_lahir);
+      $('#jenis_kelamin').val(data.jenis_kelamin);
+      $('#keterangan').val(data.keterangan);
+      $('#status').val(data.status);
 
-            // Wali Santri data
-            $('#nama_wali_ayah').val(data.nama_wali_ayah);
-            $('#telepon_wali_ayah').val(data.telepon_wali_ayah);
-            $('#alamat_wali_ayah').val(data.alamat_wali_ayah);
-            $('#nama_wali_ibu').val(data.nama_wali_ibu);
-            $('#telepon_wali_ibu').val(data.telepon_wali_ibu);
-            $('#alamat_wali_ibu').val(data.alamat_wali_ibu);
+      // Grup Kelompok Santri
+      $('#grup_cabang').val(data.grup_cabang);
+      $('#grup_santri').val(data.grup_santri);
+      $('#kelompok_quran').val(data.kelompok_quran);
 
-            // Buka modal
-            $('#modalEditData').modal('show');
-
-            // Pastikan tab pertama aktif saat modal dibuka
-            $('#editSantriTabs a:first').tab('show');
-        },
-        error: function () {
-            alert("Data tidak ditemukan atau terjadi kesalahan.");
-        }
+      // Wali Santri data
+      $('#nama_wali_ayah').val(data.nama_wali_ayah);
+      $('#telepon_wali_ayah').val(data.telepon_wali_ayah);
+      $('#alamat_wali_ayah').val(data.alamat_wali_ayah);
+      $('#nama_wali_ibu').val(data.nama_wali_ibu);
+      $('#telepon_wali_ibu').val(data.telepon_wali_ibu);
+      $('#alamat_wali_ibu').val(data.alamat_wali_ibu);
     });
 
     // Form validation setup
@@ -274,48 +264,6 @@ $(function () {
                         message: '*Wajib Diisi'
                     }
                 }
-            },
-            nama_wali_ayah: {
-              validators: {
-                  notEmpty: {
-                      message: '*Wajib Diisi'
-                  }
-              }
-            },
-            telepon_wali_ayah: {
-                validators: {
-                    notEmpty: {
-                        message: '*Wajib Diisi'
-                    }
-                }
-            },
-            alamat_wali_ayah: {
-              validators: {
-                  notEmpty: {
-                      message: '*Wajib Diisi'
-                  }
-              }
-            },
-            nama_wali_ibu: {
-                validators: {
-                    notEmpty: {
-                        message: '*Wajib Diisi'
-                    }
-                }
-            },
-            telepon_wali_ibu: {
-              validators: {
-                  notEmpty: {
-                      message: '*Wajib Diisi'
-                  }
-              }
-            },
-            alamat_wali_ibu: {
-                validators: {
-                    notEmpty: {
-                        message: '*Wajib Diisi'
-                    }
-                }
             }
         },
         plugins: {
@@ -329,11 +277,10 @@ $(function () {
             submitButton: new FormValidation.plugins.SubmitButton(),
             autoFocus: new FormValidation.plugins.AutoFocus()
         }
-    });
-    fv.on('core.form.valid', function () {
+    }).on('core.form.valid', function () {
         // Submit form data via AJAX
         $.ajax({
-            url: `${baseUrl}santri-list`,
+            url: ''.concat(baseUrl, 'guru-list'),
             type: 'POST',
             data: $('#editData').serialize(),
             success: function (response) {

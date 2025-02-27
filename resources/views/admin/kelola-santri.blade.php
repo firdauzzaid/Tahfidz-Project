@@ -69,7 +69,7 @@
                                     <a class="nav-link active" id="santri-tab" data-bs-toggle="tab" href="#dataSantri" role="tab">Data Santri</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="data-wali-tab" data-bs-toggle="tab" href="#data-wali" role="tab">Data Wali Santri</a>
+                                    <a class="nav-link" id="data-wali-tab" data-bs-toggle="tab" href="#data-wali-add" role="tab">Data Wali Santri</a>
                                 </li>
                             </ul>
 
@@ -142,7 +142,7 @@
                                 </div>
 
                                 <!-- Tab Data Wali Santri -->
-                                <div class="tab-pane fade" id="data-wali" role="tabpanel"
+                                <div class="tab-pane fade" id="data-wali-add" role="tabpanel"
                                     aria-labelledby="data-wali-tab">
                                     <div class="row">
                                         <h5 class="fw-bold text-center">Wali Santri - Ayah</h5>
@@ -200,23 +200,23 @@
                         <h5 class="modal-title" id="modalEditTitle">Edit Santri</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form class="edit-data-santri" id="editData">
+                    <form class="edit-data-user" id="editData" method="POST">
+                        <div class="modal-body">
                         @csrf
                         <input type="hidden" id="id" name="id">
-                        <div class="modal-body">
                             <!-- Tab Navigation -->
                             <ul class="nav nav-tabs" id="editSantriTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link active" id="data-santri-tab" data-bs-toggle="tab" href="#data-santri" role="tab" aria-controls="data-santri" aria-selected="true">Data Santri</a>
+                                    <a class="nav-link active" id="data-santri-tab" data-bs-toggle="tab" href="#data-santri-edit" role="tab">Data Santri</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="data-wali-tab" data-bs-toggle="tab" href="#data-wali" role="tab" aria-controls="data-wali" aria-selected="false">Data Wali Santri</a>
+                                    <a class="nav-link" id="data-wali-tab" data-bs-toggle="tab" href="#data-wali-edit" role="tab">Data Wali Santri</a>
                                 </li>
                             </ul>
 
                             <div class="tab-content p-3">
                                 <!-- Tab Data Santri -->
-                                <div class="tab-pane fade show active" id="data-santri" role="tabpanel" aria-labelledby="data-santri-tab">
+                                <div class="tab-pane fade show active" id="data-santri-edit" role="tabpanel">
                                     <div class="row">
                                         <div class="mb-3">
                                             <label for="no_identitas">No Identitas</label>
@@ -281,7 +281,7 @@
                                 </div>
 
                                 <!-- Tab Data Wali Santri -->
-                                <div class="tab-pane fade" id="data-wali" role="tabpanel" aria-labelledby="data-wali-tab">
+                                <div class="tab-pane fade" id="data-wali-edit" role="tabpanel">
                                     <div class="row">
                                         <h5 class="fw-bold text-center">Wali Santri - Ayah</h5>
                                         <div class="mb-3">
@@ -324,7 +324,9 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Pilih elemen grup cabang

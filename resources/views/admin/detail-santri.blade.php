@@ -145,7 +145,7 @@
                     <h5 class="modal-title" id="modalEditTitle">Edit Detail Santri</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="userForm" action="/admin/edit-data-santri" method="POST" enctype="multipart/form-data">
+                <form id="userForm" action="/admin/edit-data-santri/{{ $detailSantri->id }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" value="{{ $detailSantri->id }}">
                     <div class="modal-body">
@@ -166,21 +166,22 @@
                                 </button>
                             </li>
                         </ul>
+
                         <div class="tab-content p-3">
                             <!-- Tab Data Santri -->
                             <div class="tab-pane fade show active" id="data-santri" role="tabpanel" aria-labelledby="data-santri-tab">
                                 <div class="row">
                                     <div class="mb-3">
-                                        <label for="nama_lengkap" class="form-label">Nama</label>
-                                        <input type="text" class="form-control" placeholder="Nama"
-                                            name="nama_lengkap" value="{{ $detailSantri->nama_lengkap }}"
-                                            aria-label="Nama" required />
-                                    </div>
-                                    <div class="mb-3">
                                         <label for="no_identitas" class="form-label">No Identitas</label>
                                         <input type="text" class="form-control" placeholder="No Identitas"
                                             name="no_identitas" value="{{ $detailSantri->no_identitas }}"
                                             aria-label="No Identitas" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="nama_lengkap" class="form-label">Nama</label>
+                                        <input type="text" class="form-control" placeholder="Nama"
+                                            name="nama_lengkap" value="{{ $detailSantri->nama_lengkap }}"
+                                            aria-label="Nama" required />
                                     </div>
                                     <div class="mb-3">
                                         <label for="alamat" class="form-label">Alamat</label>
@@ -206,8 +207,7 @@
                                     <div class="mb-3">
                                         <label for="keterangan" class="form-label">Keterangan</label>
                                         <input type="text" class="form-control" placeholder="Keterangan"
-                                            name="keterangan" value="{{ $detailSantri->keterangan }}"
-                                            aria-label="Keterangan" required />
+                                            name="keterangan" value="{{ $detailSantri->keterangan }}"/>
                                     </div>
                                     <div class="mb-3">
                                         <label for="grup_cabang" class="form-label">Kelas</label>
@@ -232,8 +232,8 @@
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="grup_kelompok" class="form-label">Kelompok Qur'an</label>
-                                        <select class="form-select" name="grup_kelompok" required>
+                                        <label for="kelompok_quran" class="form-label">Kelompok Qur'an</label>
+                                        <select class="form-select" name="kelompok_quran" required>
                                             @foreach ($grupKelompok as $kelompokGroup)
                                                 <option value="{{ $kelompokGroup->id }}"
                                                     {{ $detailSantri->id_grup_kelompok == $kelompokGroup->id ? 'selected' : '' }}>

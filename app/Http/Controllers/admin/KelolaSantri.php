@@ -410,33 +410,39 @@ class KelolaSantri extends Controller
    */
   public function edit($id): JsonResponse
   {
-    $user = DB::table('data_santri')->where('id', $id)->first();
+      $user = DB::table('data_santri')->where('id', $id)->first();
 
-    if ($user) {
+      if (!$user) {
+          return response()->json(['message' => 'User not found'], 404);
+      }
+
       // Ambil data wali santri (ayah)
       $waliAyah = DB::table('data_walisantri')
-        ->where('id_santri', $id)
-        ->where('hubungan', 'Ayah')
-        ->first();
+          ->where('id_santri', $id)
+          ->where('hubungan', 'Ayah')
+          ->first();
 
       // Ambil data wali santri (ibu)
       $waliIbu = DB::table('data_walisantri')
-        ->where('id_santri', $id)
-        ->where('hubungan', 'Ibu')
-        ->first();
+          ->where('id_santri', $id)
+          ->where('hubungan', 'Ibu')
+          ->first();
 
       // Gabungkan data santri dengan data wali
-      $user->nama_wali_ayah = $waliAyah ? $waliAyah->nama_wali : '';
-      $user->telepon_wali_ayah = $waliAyah ? $waliAyah->telepon : '';
-      $user->alamat_wali_ayah = $waliAyah ? $waliAyah->alamat : '';
-      $user->nama_wali_ibu = $waliIbu ? $waliIbu->nama_wali : '';
-      $user->telepon_wali_ibu = $waliIbu ? $waliIbu->telepon : '';
-      $user->alamat_wali_ibu = $waliIbu ? $waliIbu->alamat : '';
+      $user->nama_wali_ayah = $waliAyah->nama_wali ?? '';
+      $user->telepon_wali_ayah = $waliAyah->telepon ?? '';
+      $user->alamat_wali_ayah = $waliAyah->alamat ?? '';
       
+      $user->nama_wali_ibu = $waliIbu->nama_wali ?? '';
+      $user->telepon_wali_ibu = $waliIbu->telepon ?? '';
+      $user->alamat_wali_ibu = $waliIbu->alamat ?? '';
+
+      // Ambil ID grup yang terkait dengan santri
+      $user->grup_cabang = $user->id_grup_cabang ?? '';
+      $user->grup_santri = $user->id_grup_santri ?? '';
+      $user->kelompok_quran = $user->id_grup_kelompok ?? '';
+
       return response()->json($user);
-    } else {
-      return response()->json(['message' => 'User not found'], 404);
-    }
   }
 
   public function editdataSantri(Request $request)
@@ -506,7 +512,7 @@ class KelolaSantri extends Controller
           'keterangan' => $keterangan,
           'id_grup_cabang' => $grup_cabang,
           'id_grup_santri' => $grup_santri,
-          'id_kelompok_quran' => $kelompok_quran,
+          'id_grup_kelompok' => $kelompok_quran,
           'status' => $status,
           'updated_at' => now(),
         ]);
@@ -537,13 +543,11 @@ class KelolaSantri extends Controller
 
       DB::commit(); // Commit transaksi jika berhasil
 
-      return redirect()->route('admin.detail-santri', ['id' => $id])
-        ->with('success', 'Data santri berhasil diperbarui.');
+      return redirect()->back()->with('success', 'Data santri berhasil diperbarui.');
     } catch (\Exception $e) {
       DB::rollBack(); // Rollback transaksi jika terjadi error
 
-      return redirect()->route('admin.kelola-santri')
-        ->with('error', 'Gagal memperbarui data santri: ' . $e->getMessage());
+      return redirect()->back()->with('error', 'Gagal memperbarui data santri: ' . $e->getMessage());
     }
   }
 }
