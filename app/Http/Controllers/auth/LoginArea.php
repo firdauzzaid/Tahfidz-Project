@@ -40,6 +40,32 @@ public function cekLogin(Request $request)
         $identifier .= '@gmail.com';
     }
 
+    // Cek input
+    // if (is_numeric($identifier)) {
+    //     // Jika input adalah nomor telepon, cari berdasarkan telepon
+    //     $user = DB::table('users')
+    //         ->join('data_walisantri', 'users.id', '=', 'data_walisantri.id_santri')
+    //         ->where('data_walisantri.telepon', $identifier)
+    //         ->select('users.*', 'data_walisantri.telepon')
+    //         ->first();
+    // } else {
+    //     // Jika input bukan nomor telepon, tambahkan @gmail.com jika tidak ada
+    //     if (!str_contains($identifier, '@')) {
+    //         $identifier .= '@gmail.com';
+    //     }
+
+    //     // Cari berdasarkan email
+    //     $user = DB::table('users')
+    //         ->join('data_walisantri', 'users.id', '=', 'data_walisantri.id_santri')
+    //         ->where('users.email', $identifier)
+    //         ->select('users.*', 'data_walisantri.telepon')
+    //         ->first();
+            
+    //     if (!$user) {
+    //         return redirect()->back()->with('error', 'Email tidak ditemukan.');
+    //     }
+    // }
+
     // Ambil password
     $password = $request->input('password');
     // Ambil password dari nomor telepon

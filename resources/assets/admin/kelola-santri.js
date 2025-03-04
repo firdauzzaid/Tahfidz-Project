@@ -209,6 +209,14 @@ $(function () {
 
     // get data
     $.get(''.concat(baseUrl, 'santri-list/').concat(user_id, '/edit'), function (data) {
+
+      console.log('Data diterima:', data); // Cek data yang diterima
+      
+      if (!data) {
+          console.error('Data tidak ditemukan atau undefined');
+          return;
+      }
+
       $('#id').val(data.id);
       $('#no_identitas').val(data.no_identitas);
       $('#nama_lengkap').val(data.nama_lengkap);
@@ -230,91 +238,111 @@ $(function () {
       $('#nama_wali_ibu').val(data.nama_wali_ibu);
       $('#telepon_wali_ibu').val(data.telepon_wali_ibu);
       $('#alamat_wali_ibu').val(data.alamat_wali_ibu);
+    
+    }).fail(function (err) {
+      console.error('Gagal mengambil data:', err);
     });
 
     // Form validation setup
     var editData = document.getElementById('editData');
-    if (editData) {
-      var fv = FormValidation.formValidation(editData, {
-        fields: {
-            no_identitas: {
-                validators: {
-                    notEmpty: {
-                        message: '*Wajib Diisi'
-                    }
-                }
-            },
-            nama_lengkap: {
-                validators: {
-                    notEmpty: {
-                        message: '*Wajib Diisi'
-                    }
-                }
-            },
-            alamat: {
-                validators: {
-                    notEmpty: {
-                        message: '*Wajib Diisi'
-                    }
-                }
-            },
-            status: {
-                validators: {
-                    notEmpty: {
-                        message: '*Wajib Diisi'
-                    }
+
+    // user form validation
+    var fv = FormValidation.formValidation(editData, {
+      fields: {
+          no_identitas: {
+              validators: {
+                  notEmpty: {
+                      message: '*Wajib Diisi'
+                  }
+              }
+          },
+          nama_lengkap: {
+              validators: {
+                  notEmpty: {
+                      message: '*Wajib Diisi'
+                  }
+              }
+          },
+          alamat: {
+              validators: {
+                  notEmpty: {
+                      message: '*Wajib Diisi'
+                  }
+              }
+          },
+          tgl_lahir: {
+            validators: {
+                notEmpty: {
+                    message: '*Wajib Diisi'
                 }
             }
+          },
+          jenis_kelamin: {
+              validators: {
+                  notEmpty: {
+                      message: '*Wajib Diisi'
+                  }
+              }
+          },
+          status: {
+              validators: {
+                notEmpty: {
+                    message: '*Wajib Diisi'
+                }
+            }
+          }
         },
         plugins: {
             trigger: new FormValidation.plugins.Trigger(),
             bootstrap5: new FormValidation.plugins.Bootstrap5({
                 eleValidClass: '',
-                rowSelector: function (field, ele) {
-                    return `.field-${field}`;
+                rowSelector: function rowSelector (field, ele) {
+                  return '.fieldnya';
                 }
             }),
             submitButton: new FormValidation.plugins.SubmitButton(),
             autoFocus: new FormValidation.plugins.AutoFocus()
         }
     }).on('core.form.valid', function () {
-        // Submit form data via AJAX
-        $.ajax({
-            url: ''.concat(baseUrl, 'guru-list'),
-            type: 'POST',
-            data: $('#editData').serialize(),
-            success: function (response) {
+          // Submit form data via AJAX
+          console.log('Form valid, mengirim data...');
+          $.ajax({
+              data: $('#editData').serialize(),
+              url: ''.concat(baseUrl, 'santri-list'),
+              type: 'POST',
+              success: function success(response) {
+                // sweetalert
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Sip, Berhasil',
-                    text: `Data pengguna berhasil ${response.status === 'created' ? 'dibuat' : 'diupdate'}`,
-                    customClass: {
-                        confirmButton: 'btn btn-success'
-                    }
+                  icon: 'success',
+                  title: 'Sip, Berhasil',
+                  text: 'Data pengguna berhasil '.concat(response.status === 'created' ? 'dibuat' : 'diupdate'),
+                  customClass: {
+                    confirmButton: 'btn btn-success'
+                  }
                 }).then(result => {
-                    if (result.isConfirmed) {
-                        window.location.reload();
-                    }
+                  if (result.isConfirmed) {
+                    window.location.reload();
+                  }
                 });
-            },
-            error: function (err) {
+              },
+              error: function error(err) {
                 const errorResponse = err.responseJSON || {};
+      
                 Swal.fire({
-                    title: 'Yah, Gagal',
-                    text: errorResponse.message || 'Terjadi kesalahan.',
-                    icon: 'error',
-                    customClass: {
-                        confirmButton: 'btn btn-danger'
-                    }
+                  title: 'Yah, Gagal',
+                  text: errorResponse.message || 'Terjadi kesalahan.',
+                  icon: 'error',
+                  customClass: {
+                    confirmButton: 'btn btn-success'
+                  }
                 }).then(result => {
-                    if (result.isConfirmed) {
-                        window.location.reload();
-                    }
+                  if (result.isConfirmed) {
+                    window.location.reload();
+                  }
                 });
-            }
+              }
+          });
         });
-      });
-    }
   });
 
   // Delete Record

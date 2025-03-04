@@ -181,7 +181,7 @@ class KelolaSantri extends Controller
               'keterangan' => 'nullable|string|max:255',
               'grup_cabang' => 'required|exists:grup_cabang,id',
               'grup_santri' => 'required|exists:grup_santri,id',
-              'grup_kelompok' => 'required|exists:kelompok_quran,id',
+              'kelompok_quran' => 'required|exists:kelompok_quran,id',
               'status' => 'required|in:0,1',
               'nama_wali_ayah' => 'required|string|max:255',
               'telepon_wali_ayah' => 'required|string|max:15',
@@ -204,9 +204,56 @@ class KelolaSantri extends Controller
                       'keterangan' => $validated['keterangan'],
                       'id_grup_cabang' => $validated['grup_cabang'],
                       'id_grup_santri' => $validated['grup_santri'],
-                      'id_grup_kelompok' => $validated['grup_kelompok'],
+                      'id_grup_kelompok' => $validated['kelompok_quran'],
                       'status' => $validated['status'],
                       'updated_at' => now(),
+                  ]);
+
+              // Buat username wali
+          $usernameWaliAyah = strtolower(str_replace(' ', '', $validated['nama_wali_ayah'])) . rand(100, 999);
+          $usernameWaliIbu = strtolower(str_replace(' ', '', $validated['nama_wali_ibu'])) . rand(100, 999);
+
+          // Periksa apakah username wali ayah sudah ada
+          $existingWaliAyah = DB::table('data_walisantri')
+              ->where('no_identitas', $usernameWaliAyah)
+              ->where('hubungan', 'Ayah')
+              ->where('id_santri', '!=', $userID)
+              ->first();
+
+          // Periksa apakah username wali ibu sudah ada
+          $existingWaliIbu = DB::table('data_walisantri')
+              ->where('no_identitas', $usernameWaliIbu)
+              ->where('hubungan', 'Ibu')
+              ->where('id_santri', '!=', $userID)
+              ->first();
+
+          if ($existingWaliAyah || $existingWaliIbu) {
+              DB::rollBack(); // Rollback transaksi jika username sudah ada
+              return redirect()->back()->with('error', 'Username wali sudah digunakan.');
+          }
+
+              // Update atau Insert data wali ayah
+              DB::table('data_walisantri')
+                ->updateOrInsert(
+                  ['id_santri' => $userID, 'hubungan' => 'Ayah'], // Kondisi
+                  [
+                    'no_identitas' => $usernameWaliAyah,
+                    'nama_wali' => $validated['nama_wali_ayah'],
+                    'telepon' => $validated['telepon_wali_ayah'],
+                    'alamat' => $validated['alamat_wali_ayah'],
+                    'updated_at' => now(),
+                  ]);
+
+              // Update atau Insert data wali ibu
+              DB::table('data_walisantri')
+                ->updateOrInsert(
+                  ['id_santri' => $userID, 'hubungan' => 'Ibu'], // Kondisi
+                  [
+                    'no_identitas' => $usernameWaliIbu,
+                    'nama_wali' => $validated['nama_wali_ibu'],
+                    'telepon' => $validated['telepon_wali_ibu'],
+                    'alamat' => $validated['alamat_wali_ibu'],
+                    'updated_at' => now(),
                   ]);
 
               DB::commit();
@@ -429,10 +476,12 @@ class KelolaSantri extends Controller
           ->first();
 
       // Gabungkan data santri dengan data wali
+      // $user->no_identitas = $waliAyah->no_identitas ?? '';
       $user->nama_wali_ayah = $waliAyah->nama_wali ?? '';
       $user->telepon_wali_ayah = $waliAyah->telepon ?? '';
       $user->alamat_wali_ayah = $waliAyah->alamat ?? '';
       
+      // $user->no_identitas = $waliIbu->no_identitas ?? '';
       $user->nama_wali_ibu = $waliIbu->nama_wali ?? '';
       $user->telepon_wali_ibu = $waliIbu->telepon ?? '';
       $user->alamat_wali_ibu = $waliIbu->alamat ?? '';

@@ -51,6 +51,10 @@
                                     <span>{{ $detailSantri->jenis_kelamin ?? '-' }}</span>
                                 </li>
                                 <li class="mb-2">
+                                    <span class="h6">Keterangan:</span>
+                                    <span>{{ $detailSantri->keterangan ?? '-' }}</span>
+                                </li>
+                                <li class="mb-2">
                                     <span class="h6">Grup Cabang:</span>
                                     <span>{{ $detailSantri->nama_grup_cabang ?? '-' }}</span>
                                 </li>

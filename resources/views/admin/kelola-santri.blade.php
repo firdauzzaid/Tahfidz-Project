@@ -77,7 +77,7 @@
                                 <!-- Tab Data Santri -->
                                 <div class="tab-pane fade show active" id="dataSantri" role="tabpanel" aria-labelledby="santri-tab">
                                     <div class="row">
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="nama_lengkap" class="form-label">Nama</label>
                                             <input type="text" class="form-control" placeholder="Nama"
                                                 name="nama_lengkap" aria-label="Nama" required />
@@ -200,10 +200,10 @@
                         <h5 class="modal-title" id="modalEditTitle">Edit Santri</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form class="edit-data-user" id="editData" method="POST">
-                        <div class="modal-body">
+                    <form class="edit-data-user" id="editData">
                         @csrf
                         <input type="hidden" id="id" name="id">
+                        <div class="modal-body">
                             <!-- Tab Navigation -->
                             <ul class="nav nav-tabs" id="editSantriTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
@@ -218,23 +218,23 @@
                                 <!-- Tab Data Santri -->
                                 <div class="tab-pane fade show active" id="data-santri-edit" role="tabpanel">
                                     <div class="row">
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="no_identitas">No Identitas</label>
                                             <input type="text" class="form-control" id="no_identitas" name="no_identitas" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="nama_lengkap">Nama</label>
                                             <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="alamat">Alamat</label>
                                             <input type="text" class="form-control" id="alamat" name="alamat" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="tgl_lahir">Tanggal Lahir</label>
                                             <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="jenis_kelamin">Jenis Kelamin</label>
                                             <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
                                                 <option value="">Pilih Salah Satu</option>
@@ -242,11 +242,11 @@
                                                 <option value="Perempuan">Perempuan</option>
                                             </select>
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="keterangan">Keterangan</label>
                                             <input type="text" class="form-control" id="keterangan" name="keterangan" />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="grup_cabang">Kelas</label>
                                             <select class="form-select" id="grup_cabang" name="grup_cabang" required>
                                                 @foreach ($grupCabang as $cabang)
@@ -254,7 +254,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="grup_santri">Rombel</label>
                                             <select class="form-select" id="grup_santri" name="grup_santri" required>
                                                 @foreach ($grupSantri as $santri)
@@ -262,7 +262,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="kelompok_quran">Kelompok Qur'an</label>
                                             <select class="form-select" id="kelompok_quran" name="kelompok_quran" required>
                                                 @foreach ($grupKelompok as $kelompok)
@@ -270,7 +270,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="status">Status</label>
                                             <select class="form-select" id="status" name="status" required>
                                                 <option value="0">Aktif</option>
@@ -284,29 +284,29 @@
                                 <div class="tab-pane fade" id="data-wali-edit" role="tabpanel">
                                     <div class="row">
                                         <h5 class="fw-bold text-center">Wali Santri - Ayah</h5>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="nama_wali_ayah">Nama Wali Ayah</label>
                                             <input type="text" class="form-control" id="nama_wali_ayah" name="nama_wali_ayah" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="telepon_wali_ayah">Telepon Ayah</label>
                                             <input type="number" class="form-control" id="telepon_wali_ayah" name="telepon_wali_ayah" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="alamat_wali_ayah">Alamat Ayah</label>
                                             <input type="text" class="form-control" id="alamat_wali_ayah" name="alamat_wali_ayah" required />
                                         </div>
 
                                         <h5 class="fw-bold text-center">Wali Santri - Ibu</h5>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="nama_wali_ibu">Nama Wali Ibu</label>
                                             <input type="text" class="form-control" id="nama_wali_ibu" name="nama_wali_ibu" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="telepon_wali_ibu">Telepon Ibu</label>
                                             <input type="number" class="form-control" id="telepon_wali_ibu" name="telepon_wali_ibu" required />
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="fieldnya mb-3">
                                             <label for="alamat_wali_ibu">Alamat Ibu</label>
                                             <input type="text" class="form-control" id="alamat_wali_ibu" name="alamat_wali_ibu" required />
                                         </div>
@@ -324,9 +324,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Pilih elemen grup cabang
