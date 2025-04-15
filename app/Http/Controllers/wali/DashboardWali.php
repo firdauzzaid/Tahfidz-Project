@@ -64,7 +64,7 @@ class DashboardWali extends Controller
         // Tambahkan nama guru ke data absensi
         foreach ($absensi as $absen) {
             $guru = DB::table('data_guru')
-                ->where('id', $absen->id_guru)
+                ->where('id_users', $absen->id_guru)
                 ->select('id_users')
                 ->first();
     
@@ -126,7 +126,7 @@ class DashboardWali extends Controller
             ->get();
     
         foreach ($nilai_ptahsin as $ptahsin) {
-            $guru = DB::table('data_guru')->where('id', $ptahsin->id_guru)->select('id_users')->first();
+            $guru = DB::table('data_guru')->where('id_users', $ptahsin->id_guru)->select('id_users')->first();
             $userGuru = $guru ? DB::table('users')->where('id', $guru->id_users)->select('nama_lengkap')->first() : null;
             $ptahsin->nama_guru = $userGuru ? $userGuru->nama_lengkap : 'Tidak Diketahui';
         }
@@ -177,7 +177,7 @@ class DashboardWali extends Controller
         $allNilai = [$nilai_ptahfidz, $nilai_mtahsin, $nilai_mtahfidz, $nilai_murojaah, $nilai_tasmi];
         foreach ($allNilai as $nilaiCollection) {
             foreach ($nilaiCollection as $nilai) {
-                $guru = DB::table('data_guru')->where('id', $nilai->id_guru)->select('id_users')->first();
+                $guru = DB::table('data_guru')->where('id_users', $nilai->id_guru)->select('id_users')->first();
                 $userGuru = $guru ? DB::table('users')->where('id', $guru->id_users)->select('nama_lengkap')->first() : null;
                 $nilai->nama_guru = $userGuru ? $userGuru->nama_lengkap : 'Tidak Diketahui';
             }

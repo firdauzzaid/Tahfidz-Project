@@ -35,7 +35,7 @@
                                 <select class="form-select" id="grupCabangTahsin" name="grup_cabang" required>
                                     <option selected>Pilih Kelas</option>
                                     <!-- Options Here -->
-                                    </select>
+                                </select>
                             </div>
 
                             <div class="mb-3">

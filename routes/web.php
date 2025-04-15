@@ -131,7 +131,7 @@ Route::middleware(['auth-guru'])->group(function () {
   Route::get('/munaqasyah-tahsin', [KelolaDataRaport::class, 'munaqasyahTahsin'])->name('guru.munaqasyahTahsin');
   Route::post('/simpan-munaqasyah-tahsin', [KelolaDataRaport::class, 'simpanMTahsin'])->name('guru.simpanMTahsin');
   Route::post('/simpan-data-lanjutan-mtahsin', [KelolaDataRaport::class, 'simpanDataLanjutanMTahsin'])->name('guru.simpanDataLanjutanMTahsin');
-  Route::get('/tambah-data-awal-mtahfidz', [KelolaDataRaport::class, 'tambahDataAwalMTahsin'])->name('guru.tambahDataAwalMTahsin');
+  Route::get('/tambah-data-awal-mtahsin', [KelolaDataRaport::class, 'tambahDataAwalMTahsin'])->name('guru.tambahDataAwalMTahsin');
   Route::post('/hapus-munaqasyah-tahsin/{id}', [KelolaDataRaport::class, 'hapusMTahsin'])->name('guru.hapusMTahsin');
 
   Route::get('/munaqasyah-tahfidz', [KelolaDataRaport::class, 'munaqasyahTahfidz'])->name('guru.munaqasyahTahfidz');
